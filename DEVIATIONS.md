@@ -33,3 +33,14 @@ Changes to, or implementation choices within, `PREREGISTRATION.md` after it was 
 - Two-sided empirical p = min(1, 2 x the smaller of the one-sided empirical p-values).
 - Placebo tests cover only events that have at least one candidate. Audio_Moth_5 and Audio_Moth_6 isolated events have none under either pool.
 - Placebo results are not part of the pre-registered gate. They enter the decision rules only through the "biological response" criterion after the gate is passed.
+
+## Week 4: decision script (`src/decision.py`)
+
+- The rules are implemented exactly as written in `PREREGISTRATION.md`. Two points the text left open were fixed in code before the script was run on the real tables:
+  - The "variant 2 outside the 95% placebo range" check compares the variant 2 model estimate with the strict-pool null range (2.5th to 97.5th percentile). The model estimate uses all isolated events; the placebo uses only events with a candidate day, so the two are on different event sets. The script reports both and the placebo event count, and the criterion is only reached if the gate passes.
+  - When no placebo exists for variant 2, the biological-response verdict rests on consistency alone and says so in the output.
+- On the real tables the gate fails (variant 1 two-sided p = 0.64), so the verdict is inconclusive and this branch is not reached.
+- Review after the first run found two gaps, both corrected before commit:
+  - The plan lists a mixed-effects **count** model (log recorded minutes as offset) as the secondary cross-check. Weeks 2 to 4 only fit linear mixed models on the baseline-adjusted deviation, so that item is not complete and is unchecked in the README. A count model on 6 recorders would need a choice (for example a Poisson GLMM or a clustered Poisson GEE, whose standard errors are unreliable with so few clusters) and is not pre-registered. It is left as an open decision.
+  - `decision_summary.csv` did not say the results come from the reconstructed draft hypotheses file, which `PREREGISTRATION.md` requires. A `hypotheses_source` column now carries that label.
+- Fit note: 31 of 72 model fits needed the Powell optimizer fallback (`fit_method = mixedlm_powell`), and one had no valid standard error. This is the lead's fitting code, unchanged.

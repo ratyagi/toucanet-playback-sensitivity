@@ -64,13 +64,15 @@ Statistics:
 - [x] All 6 variants implemented (the 5 in the table plus 2b: 20-60 at 5-minute bins). Variant 1 reproduces the reference results.
 
 ### Week 3: Placebo matching and event types
-- [ ] Define placebo exclusions (see Open issues) and apply to every variant.
-- [ ] Split isolated vs. overlapping events.
-- [ ] Log usable events, clips, and recorders left under every rule.
+- [x] Define placebo exclusions (strict pool as primary, relaxed pool as sensitivity) and apply to every variant, with position-matched clip drops in the detection-excluded variants.
+- [x] Split isolated vs. overlapping events.
+- [x] Log usable events, clips, and recorders left under every rule (`results/tables/placebo_pool_summary.csv`, `variant_effort_summary.csv`).
 
 ### Week 4: Models
-- [ ] Event-level delta + placebo permutation test (primary).
-- [ ] Mixed-effects count model (secondary, cross-check).
+- [x] Event-level delta + placebo permutation test (primary): the pre-registered decision rules are applied in `src/decision.py` to the Week 2 models and Week 3 placebo tables (`results/tables/decision_summary.csv`).
+- [ ] Mixed-effects **count** model (secondary, cross-check, log recorded minutes as offset). Not done: the Week 2 models are linear mixed models on the baseline-adjusted deviation (call rate and taxa count). The linear fits are reported next to the placebo result with the minimum detectable effect on every row, but they are not the count model in the plan. See `DEVIATIONS.md`.
+- [x] Per-recorder view of the primary test (`results/tables/recorder_coverage.csv`).
+- Result: the gate fails (variant 1, two-sided p = 0.64), so the verdict is **inconclusive** and the other variants are descriptive.
 
 ### Week 5: Diagnostics
 - [ ] Plot YAMNet score, call rate, taxa count around each event.
@@ -132,6 +134,13 @@ Run from the repo root in PowerShell. The raw dataset is not in git and lives in
    .venv\Scripts\python src\run_placebos.py --dataset ..\bioacoustics_dataset.csv
    ```
    Checks printed: `clip-level recompute matches binned values for 29 events` (detection-excluded variants) and `Variant 1 strict-pool placebo reproduces the lead-code output.` Output: `results\tables\placebo_results.csv` and `placebo_pool_summary.csv`.
+
+8. Apply the pre-registered decision rules (reads existing tables only; needs steps 6 and 7 first):
+   ```
+   .venv\Scripts\python tests\test_decision.py
+   .venv\Scripts\python src\decision.py
+   ```
+   Output: `results\tables\decision_summary.csv` (verdict per variant and an OVERALL row) and `results\tables\recorder_coverage.csv`.
 
 Seeds are fixed in the scripts (placebo default 20251002). Results in `results/intermediate/` are regenerated, never edited by hand. Choices fixed before analysis are in `PREREGISTRATION.md`; later changes go in `DEVIATIONS.md`.
 
