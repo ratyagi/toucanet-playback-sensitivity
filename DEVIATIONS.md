@@ -80,3 +80,31 @@ Written and committed before any count model was run. The plan lists a count mod
 - If a fit does not converge, it is reported as not estimable. No other family, window, or terms are tried afterward.
 - Both fits are reported whether or not they agree with the linear model.
 - The README item stays unchecked until the result is committed.
+
+## Week 6 addendum: leakage and robustness checks (specification fixed before running)
+
+Written and committed before either check was run. Both are exploratory sensitivity checks of the primary test. Neither can change the verdict, which stays with the pre-registered gate.
+
+**Check A: leave-own-day-out baseline**
+- Reason: the reference baseline is the median of all clean bins for the same recorder and time of day. That includes the event's own pre-window bins. With 5 days of recording, the event's own day can be one of at most 5 baseline values, so its pre-window residuals are shrunk toward zero.
+- Method: for every bin, the baseline excludes clean bins of the same recorder and time of day that fall on the same calendar date as the bin. Everything else is unchanged: clean-bin definition, 15-minute bins, contrast definition, event set, and the lead's mixed model.
+- Windows: variant 1 (0 to 60 min) and variant 2 (15 to 60 min).
+- Bins left without any baseline are dropped, as in the reference method. The number of events with a usable contrast is reported next to the estimate.
+- Output: estimate, standard error, two-sided p, events, next to the primary result.
+
+**Check B: leave-one-recorder-out (the experiment's LODO analog)**
+- Reason: recorders are the sites. The result should not depend on one of them.
+- Method: refit the primary isolated call-rate model with each of the 6 recorders omitted in turn, for variants 1 and 2. Same model, same code.
+- A recorder is flagged influential if omitting it flips the sign of the estimate or moves the two-sided p across 0.05.
+- Output: estimate, standard error, two-sided p, and events for each omitted recorder, plus the range of estimates.
+- A fit that fails is reported as not estimable.
+
+**Recommendation section in `REPORT.md`**
+- The mapping from verdict to action is written after the verdict (inconclusive) was known, and the report says so.
+  - Biological response: go, the disturbance signal can be used as a label.
+  - Direct contamination: no-go until the labels are cleaned.
+  - Mixed or inconclusive: hold, the signal is unvalidated and clean-baseline data is needed first.
+- The mapping is a recommendation for this experiment's scope. The team's December go/no-go on the embedding paradigm is a separate decision.
+
+**Not adjusted**
+- No multiplicity correction across variants. The gate is a single test, so the verdict is unaffected.
