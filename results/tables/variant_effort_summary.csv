@@ -1,0 +1,7 @@
+variant,bin_minutes,post_window,yamnet_excluded,isolated_events_with_contrast,isolated_recorders,median_post_bins_used,median_pre_bins_used,median_post_window_clips,median_pre_window_clips,dataset_clips_removed,dataset_minutes_removed,dataset_share_removed
+v1_original,15,0-60,False,10,6,3.0,4.0,897.5,1200.0,0,0.0,0.0
+v2_post_playback,15,15-60,False,9,6,3.0,4.0,899.0,1200.0,0,0.0,0.0
+v2b_post_playback_5min,5,20-60,False,11,6,7.0,12.0,700.0,1200.0,0,0.0,0.0
+v3_buffered,15,30-60,False,8,6,2.0,4.0,600.0,1200.0,0,0.0,0.0
+v4a_original_excluded,15,0-60,True,10,6,3.0,4.0,841.0,1200.0,5509,275.45,0.008726147237300834
+v4b_post_playback_excluded,15,15-60,True,9,6,3.0,4.0,809.0,1200.0,5509,275.45,0.008726147237300834

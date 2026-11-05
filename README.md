@@ -59,8 +59,9 @@ Statistics:
 - [ ] Commit `PREREGISTRATION.md` (windows, exclusions, primary outcome, criteria) before running any variant.
 
 ### Week 2: Windows as config
-- [ ] One function: window spec + exclusion rule in, pre/post rates out.
-- [ ] Implement all 5 variants from the table above.
+- [x] One config per variant (`configs/variants/`) and a runner (`src/run_variants.py`) that takes window spec + exclusion rule and returns the contrasts and models.
+- [x] YAMNet exclusion filter (`src/exclusion.py`, tested in `tests/`).
+- [x] All 6 variants implemented (the 5 in the table plus 2b: 20-60 at 5-minute bins). Variant 1 reproduces the reference results.
 
 ### Week 3: Placebo matching and event types
 - [ ] Define placebo exclusions (see Open issues) and apply to every variant.
@@ -117,6 +118,13 @@ Run from the repo root in PowerShell. The raw dataset is not in git and lives in
    .venv\Scripts\python src\derive_event_spans.py --dataset ..\bioacoustics_dataset.csv --events reference\events.csv --output reference\event_spans.csv
    ```
    Check: it reports 61 events matched, 29 human-presence events, 22 of 29 with a YAMNet detection, and 168 YAMNet-positive clips.
+
+6. Run the unit tests, then all six response-window variants (variant 1 must reproduce the reference, or the run stops):
+   ```
+   .venv\Scripts\python tests\test_exclusion.py
+   .venv\Scripts\python src\run_variants.py --dataset ..\bioacoustics_dataset.csv
+   ```
+   Output: `results\tables\variant_results.csv`, `variant_recorder_results.csv`, `variant_effort_summary.csv`.
 
 Seeds are fixed in the scripts (placebo default 20251002). Results in `results/intermediate/` are regenerated, never edited by hand. Choices fixed before analysis are in `PREREGISTRATION.md`; later changes go in `DEVIATIONS.md`.
 

@@ -1,0 +1,27 @@
+{
+  "name": "v1_original",
+  "description": "Original window",
+  "bin_minutes": 15,
+  "pre_window": {
+    "start_minutes": -60,
+    "end_minutes_exclusive": 0
+  },
+  "post_window": {
+    "start_minutes": 0,
+    "end_minutes_exclusive": 60
+  },
+  "exclude_yamnet": false,
+  "yamnet_tail_seconds": 300,
+  "hypotheses": [
+    {
+      "name": "primary_call_rate",
+      "metric": "call_rate",
+      "alternative": "less"
+    },
+    {
+      "name": "secondary_taxa_count",
+      "metric": "taxa_count",
+      "alternative": "less"
+    }
+  ]
+}
