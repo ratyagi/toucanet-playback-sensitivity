@@ -126,6 +126,13 @@ Run from the repo root in PowerShell. The raw dataset is not in git and lives in
    ```
    Output: `results\tables\variant_results.csv`, `variant_recorder_results.csv`, `variant_effort_summary.csv`.
 
+7. Run the placebo-in-time calibration for every variant (strict pool and secondary relaxed pool; needs step 6 first):
+   ```
+   .venv\Scripts\python tests\test_placebo_core.py
+   .venv\Scripts\python src\run_placebos.py --dataset ..\bioacoustics_dataset.csv
+   ```
+   Checks printed: `clip-level recompute matches binned values for 29 events` (detection-excluded variants) and `Variant 1 strict-pool placebo reproduces the lead-code output.` Output: `results\tables\placebo_results.csv` and `placebo_pool_summary.csv`.
+
 Seeds are fixed in the scripts (placebo default 20251002). Results in `results/intermediate/` are regenerated, never edited by hand. Choices fixed before analysis are in `PREREGISTRATION.md`; later changes go in `DEVIATIONS.md`.
 
 ## Data

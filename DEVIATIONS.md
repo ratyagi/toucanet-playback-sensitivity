@@ -24,3 +24,12 @@ Changes to, or implementation choices within, `PREREGISTRATION.md` after it was 
 - Status: post hoc and exploratory. Not part of the decision rules. Reported next to all other results, labeled by the `method` column.
 - Caution: the raw contrast is confounded by the normal rise and fall of activity around dawn and dusk, when most events were staged.
 - Variant results seen when written: yes, all six primary variants (all non-significant, two-sided p from 0.48 to 0.69). The motivation was data coverage, not the size or direction of any estimate.
+
+## 2026-11-05: Placebo implementation choices (clarifications, recorded after the first placebo run)
+
+- Written after the first run of `src/run_placebos.py`. The code defining these choices was written before any placebo result was seen.
+- Matched clip positions: a clip's position is its time since the start of its bin, in 3-second steps. The positions removed by the YAMNet filter in a real event window (from the pre-window start to the post-window end) are removed from every placebo candidate window for that event, in addition to any clips the filter removes there itself.
+- Placebo draws use the reference seed (20251002) and the reference draw order, once per analysis group (isolated, overlapping), so strict-pool results for variant 1 match the lead's code exactly.
+- Two-sided empirical p = min(1, 2 x the smaller of the one-sided empirical p-values).
+- Placebo tests cover only events that have at least one candidate. Audio_Moth_5 and Audio_Moth_6 isolated events have none under either pool.
+- Placebo results are not part of the pre-registered gate. They enter the decision rules only through the "biological response" criterion after the gate is passed.
