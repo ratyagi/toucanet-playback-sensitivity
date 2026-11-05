@@ -53,10 +53,10 @@ Statistics:
 ## Plan
 
 ### Week 1: Inputs and setup
-- [ ] Collect: `bioacoustics_dataset.csv`, existing baseline and matched-placebo code, the 29 event onset times, field-record playback end times.
-- [ ] Reproduce the existing 0-60 estimate. Do not move on until it matches.
-- [ ] Check all timestamps (dataset and field records) are in one timezone.
-- [ ] Commit `PREREGISTRATION.md` (windows, exclusions, primary outcome, criteria) before running any variant.
+- [x] Collect: `bioacoustics_dataset.csv`, existing baseline and matched-placebo code, the 29 event onset times, field-record playback end times.
+- [x] Reproduce the existing 0-60 estimate. Do not move on until it matches.
+- [x] Check all timestamps (dataset and field records) are in one timezone.
+- [x] Commit `PREREGISTRATION.md` (windows, exclusions, primary outcome, criteria) before running any variant.
 
 ### Week 2: Windows as config
 - [x] One config per variant (`configs/variants/`) and a runner (`src/run_variants.py`) that takes window spec + exclusion rule and returns the contrasts and models.
