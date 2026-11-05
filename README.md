@@ -166,6 +166,10 @@ Run from the repo root in PowerShell. The raw dataset is not in git and lives in
 
 Seeds are fixed in the scripts (placebo default 20251002). Results in `results/intermediate/` are regenerated, never edited by hand. Choices fixed before analysis are in `PREREGISTRATION.md`; later changes go in `DEVIATIONS.md`.
 
+## Presentation
+
+- Progress review deck (November 5, 2026 snapshot): `docs/Playback_Experiment_Progress_Review.pdf`. The HTML source is `docs/progress_review_source.html`. Its numbers are copied from `REPORT.md` and are not regenerated.
+
 ## Data
 
 Raw data is not committed (large files, gitignored).

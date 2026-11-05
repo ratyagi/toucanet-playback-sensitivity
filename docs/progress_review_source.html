@@ -1,0 +1,196 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8">
+<title>Playback Experiment: Progress Review</title>
+<style>
+@page { size: 1280px 720px; margin: 0; }
+:root { --ink:#1d232a; --muted:#5b6470; --accent:#1f5fa8; --line:#d9dde3; --bg:#ffffff; --soft:#f3f6fa; }
+* { box-sizing:border-box; }
+html,body { margin:0; background:var(--bg); color:var(--ink); font-family:"Segoe UI","Helvetica Neue",Arial,sans-serif; -webkit-print-color-adjust:exact; print-color-adjust:exact; }
+.slide { width:1280px; height:720px; padding:56px 72px 64px; position:relative; page-break-after:always; overflow:hidden; display:flex; flex-direction:column; }
+.slide:last-child { page-break-after:auto; }
+.kicker { font-size:15px; letter-spacing:.12em; text-transform:uppercase; color:var(--accent); font-weight:700; margin:0 0 10px; }
+h1 { font-size:40px; line-height:1.15; margin:0 0 26px; font-weight:700; }
+h2 { font-size:21px; margin:0 0 6px; font-weight:700; }
+ul { margin:0; padding-left:22px; } li { font-size:19px; line-height:1.4; margin:4px 0; }
+.item { display:flex; gap:20px; padding:16px 0; border-top:1px solid var(--line); }
+.item:first-of-type { border-top:none; padding-top:0; }
+.num { flex:0 0 40px; height:40px; border-radius:50%; background:var(--accent); color:#fff; font-weight:700; font-size:20px; display:flex; align-items:center; justify-content:center; margin-top:2px; }
+.body { flex:1; }
+.footer { position:absolute; left:72px; right:72px; bottom:24px; display:flex; justify-content:space-between; font-size:13px; color:var(--muted); border-top:1px solid var(--line); padding-top:8px; }
+.title-slide { justify-content:center; background:linear-gradient(135deg,#f3f6fa 0%,#ffffff 70%); }
+.title-slide h1 { font-size:58px; margin-bottom:16px; }
+.sub { font-size:24px; color:var(--muted); margin:0 0 34px; }
+.meta { font-size:19px; line-height:1.7; }
+a { color:var(--accent); text-decoration:none; font-weight:600; }
+.verdict { background:var(--soft); border-left:6px solid var(--accent); padding:16px 22px; font-size:22px; font-weight:600; margin-bottom:18px; }
+.two { display:flex; gap:36px; align-items:flex-start; }
+.two > div { flex:1; min-width:0; }
+.two svg { width:100%; height:auto; }
+.mid li { font-size:20px; margin:4px 0; } .mid h2 { font-size:22px; }
+.big li { font-size:23px; margin:8px 0; } .big h2 { font-size:25px; margin-bottom:8px; } .big .item { padding:22px 0; }
+.stat { display:flex; gap:28px; margin-top:18px; }
+.stat div { flex:1; background:var(--soft); border-radius:8px; padding:14px 18px; }
+.stat b { display:block; font-size:30px; color:var(--accent); }
+.stat span { font-size:15px; color:var(--muted); }
+code { font-family:Consolas,"Courier New",monospace; font-size:.92em; background:#eef1f5; padding:1px 5px; border-radius:4px; }
+.tag { display:inline-block; font-size:13px; font-weight:700; letter-spacing:.06em; text-transform:uppercase; color:var(--muted); border:1px solid var(--line); border-radius:4px; padding:1px 7px; margin-left:8px; vertical-align:middle; }
+</style></head><body>
+
+<section class="slide title-slide">
+  <p class="kicker">Team Toucanet &middot; Kashmir World Foundation</p>
+  <h1>Playback Experiment: Progress Review</h1>
+  <p class="sub">Is the response to simulated human presence a biological change in animal calls, or only the playback sound?</p>
+  <div class="meta">
+    Rashi Tyagi &middot; November 5, 2026<br>
+    Repository: <a href="https://github.com/ratyagi/toucanet-playback-sensitivity">github.com/ratyagi/toucanet-playback-sensitivity</a><br>
+    Status: draft. The hypotheses file is a reconstruction. The listening review is pending.
+  </div>
+</section>
+
+<section class="slide big">
+  <p class="kicker">Context</p>
+  <h1>The question and the method</h1>
+  <ul>
+    <li><b>Question:</b> After a simulated human passes a recorder, do animals change their calls? Or does the detector only hear the playback?</li>
+    <li><b>Data:</b> 6 AudioMoth recorders, 5 days, 29 simulated human-presence events (11 isolated, 11 overlapping, 7 incomplete).</li>
+    <li><b>Measure:</b> Call rate after each event, minus a baseline for the same recorder and time of day. Bins are 15 minutes.</li>
+    <li><b>Test:</b> Random-intercept model by recorder. The gate is two-sided p below 0.05 for the original 0-60 minute analysis.</li>
+    <li><b>Controls:</b> A placebo-in-time test (1,000 draws) and variants that remove clips that YAMNet flagged as human sound.</li>
+    <li><b>Rules fixed first:</b> <code>PREREGISTRATION.md</code> was committed before any variant ran. Every later change is in <code>DEVIATIONS.md</code>.</li>
+  </ul>
+  <div class="footer"><span>Playback Experiment: Progress Review</span><span>2</span></div>
+</section>
+
+<section class="slide mid">
+  <p class="kicker">Completed and tested</p>
+  <h1>Three parts of the work are done</h1>
+  <div class="item"><div class="num">1</div><div class="body"><h2>Reproducible setup, checked against the lead's result</h2><ul>
+    <li>Pinned Python 3.12 environment. The dataset is checked with SHA-256.</li>
+    <li>The lead's result reproduced exactly on two machines: estimate -0.41, standard error 0.87.</li>
+    <li>29 events rebuilt from clip times: onset = clip time minus <code>Sim Relative Time</code>.</li></ul></div></div>
+  <div class="item"><div class="num">2</div><div class="body"><h2>Six variants, a placebo test, and the decision rules</h2><ul>
+    <li>Six windows in JSON configs. Variants 4a and 4b remove YAMNet-positive clips and the 300 seconds after each.</li>
+    <li>Placebo-in-time: 1,000 draws, seed 20251002, strict and relaxed candidate pools, position-matched clip drops.</li>
+    <li>Gate and decision rules coded in <code>src/decision.py</code> and tested.</li></ul></div></div>
+  <div class="item"><div class="num">3</div><div class="body"><h2>Diagnostics, review sample, and reporting</h2><ul>
+    <li>Six per-recorder figures and the 22-versus-7 YAMNet split. A blind listening sample of 200 clips, with weights.</li>
+    <li>Unit tests for every module. The report is built from the result tables by script.</li></ul></div></div>
+  <div class="footer"><span>Playback Experiment: Progress Review</span><span>3</span></div>
+</section>
+
+<section class="slide">
+  <p class="kicker">Results</p>
+  <h1>Result 1: the pre-registered test is inconclusive</h1>
+  <div class="two">
+    <div style="flex:0 0 440px">
+      <div class="verdict">Gate fails: p = 0.64. It needs p &lt; 0.05.</div>
+      <ul>
+        <li>All six variants give a small drop of 0.34 to 0.58 calls per minute.</li>
+        <li>Every interval includes zero.</li>
+        <li>With 10 events, the test cannot detect changes smaller than 1.6 to 2.6 calls per minute.</li>
+        <li>This is not evidence of no effect.</li>
+      </ul>
+    </div>
+    <div><svg viewBox="0 0 760 360" width="760" height="360" role="img" aria-label="Estimate and 95% interval for each variant. All intervals include zero.">
+<line x1="308.3" y1="16" x2="308.3" y2="308" stroke="#e3e6ea" stroke-width="1"/>
+<text x="308.3" y="332" text-anchor="middle" font-size="18" fill="#5b6470">-3</text>
+<line x1="385.0" y1="16" x2="385.0" y2="308" stroke="#e3e6ea" stroke-width="1"/>
+<text x="385.0" y="332" text-anchor="middle" font-size="18" fill="#5b6470">-2</text>
+<line x1="461.7" y1="16" x2="461.7" y2="308" stroke="#e3e6ea" stroke-width="1"/>
+<text x="461.7" y="332" text-anchor="middle" font-size="18" fill="#5b6470">-1</text>
+<line x1="538.3" y1="16" x2="538.3" y2="308" stroke="#e3e6ea" stroke-width="1"/>
+<text x="538.3" y="332" text-anchor="middle" font-size="18" fill="#5b6470">0</text>
+<line x1="615.0" y1="16" x2="615.0" y2="308" stroke="#e3e6ea" stroke-width="1"/>
+<text x="615.0" y="332" text-anchor="middle" font-size="18" fill="#5b6470">+1</text>
+<line x1="691.7" y1="16" x2="691.7" y2="308" stroke="#e3e6ea" stroke-width="1"/>
+<text x="691.7" y="332" text-anchor="middle" font-size="18" fill="#5b6470">+2</text>
+<line x1="538.3" y1="16" x2="538.3" y2="308" stroke="#2b3138" stroke-width="1.5" stroke-dasharray="5 4"/>
+<text x="256" y="53.7" text-anchor="end" font-size="18" fill="#2b3138"><tspan font-weight="700">1</tspan>  0-60 min</text>
+<line x1="376.6" y1="47.7" x2="637.2" y2="47.7" stroke="#1f5fa8" stroke-width="2.5" stroke-linecap="round"/>
+<circle cx="506.9" cy="47.7" r="6.5" fill="#1f5fa8" stroke="#fff" stroke-width="2"/>
+<text x="256" y="101.0" text-anchor="end" font-size="18" fill="#2b3138"><tspan font-weight="700">2</tspan>  15-60 min</text>
+<line x1="339.0" y1="95.0" x2="664.1" y2="95.0" stroke="#1f5fa8" stroke-width="2.5" stroke-linecap="round"/>
+<circle cx="501.5" cy="95.0" r="6.5" fill="#1f5fa8" stroke="#fff" stroke-width="2"/>
+<text x="256" y="148.3" text-anchor="end" font-size="18" fill="#2b3138"><tspan font-weight="700">2b</tspan>  20-60, 5-min bins</text>
+<line x1="372.0" y1="142.3" x2="615.8" y2="142.3" stroke="#1f5fa8" stroke-width="2.5" stroke-linecap="round"/>
+<circle cx="493.9" cy="142.3" r="6.5" fill="#1f5fa8" stroke="#fff" stroke-width="2"/>
+<text x="256" y="195.7" text-anchor="end" font-size="18" fill="#2b3138"><tspan font-weight="700">3</tspan>  30-60 min</text>
+<line x1="294.5" y1="189.7" x2="700.1" y2="189.7" stroke="#1f5fa8" stroke-width="2.5" stroke-linecap="round"/>
+<circle cx="496.9" cy="189.7" r="6.5" fill="#1f5fa8" stroke="#fff" stroke-width="2"/>
+<text x="256" y="243.0" text-anchor="end" font-size="18" fill="#2b3138"><tspan font-weight="700">4a</tspan>  0-60, YAMNet removed</text>
+<line x1="381.2" y1="237.0" x2="643.4" y2="237.0" stroke="#1f5fa8" stroke-width="2.5" stroke-linecap="round"/>
+<circle cx="512.3" cy="237.0" r="6.5" fill="#1f5fa8" stroke="#fff" stroke-width="2"/>
+<text x="256" y="290.3" text-anchor="end" font-size="18" fill="#2b3138"><tspan font-weight="700">4b</tspan>  15-60, YAMNet removed</text>
+<line x1="339.0" y1="284.3" x2="666.4" y2="284.3" stroke="#1f5fa8" stroke-width="2.5" stroke-linecap="round"/>
+<circle cx="502.3" cy="284.3" r="6.5" fill="#1f5fa8" stroke="#fff" stroke-width="2"/>
+<text x="500.0" y="352" text-anchor="middle" font-size="16" fill="#5b6470">Change in call rate (calls per minute), 95% interval</text>
+</svg></div>
+  </div>
+  <div class="footer"><span>Playback Experiment: Progress Review</span><span>4</span></div>
+</section>
+
+<section class="slide big">
+  <p class="kicker">Results</p>
+  <h1>Results 2 and 3: exploratory checks</h1>
+  <div class="item"><div class="num">2</div><div class="body"><h2>The sign depends on the baseline <span class="tag">exploratory</span></h2><ul>
+    <li>Without baseline adjustment the estimate is +0.68 (p = 0.28, 11 events). With complete windows only it is +0.53 (5 events).</li>
+    <li>Audio_Moth_1 to 4 average +0.66. Audio_Moth_5 and 6 average -1.91. Each group has 5 events.</li>
+    <li>Audio_Moth_5 and 6 have no presence-free days, so their baselines are thin.</li></ul></div></div>
+  <div class="item"><div class="num">3</div><div class="body"><h2>The placebo test shows no drop <span class="tag">exploratory</span></h2><ul>
+    <li>5 events on 4 recorders. Observed +0.47. The placebo 95% range is -1.36 to +0.47. Two-sided p = 0.054.</li>
+    <li>The one-sided test for a drop gives p = 0.97. The six variants share the same 5 events.</li>
+    <li>YAMNet flagged only 1.6% of simulated clips (168 of 10,636). Mean contrast: -0.36 with a detection, -0.32 without. The split is confounded with recorder.</li></ul></div></div>
+  <div class="footer"><span>Playback Experiment: Progress Review</span><span>5</span></div>
+</section>
+
+<section class="slide">
+  <p class="kicker">Review and approval</p>
+  <h1>Three decisions I would like you to review</h1>
+  <div class="item"><div class="num">1</div><div class="body"><h2>The count model and two extra checks</h2><ul>
+    <li>Count model: negative binomial, recorded-minutes offset, recorder fixed effects, standard errors clustered by recorder and date. Six recorders are too few for a random effect.</li>
+    <li>Leave-own-day-out baseline, and a leave-one-recorder-out refit. All three are exploratory and cannot change the verdict.</li>
+    <li>The specifications were committed before any run.</li></ul></div></div>
+  <div class="item"><div class="num">2</div><div class="body"><h2>The design of the listening review</h2><ul>
+    <li>I review 200 clips (100 YAMNet-positive, 100 negative), blind to the label and the position. Order is random.</li>
+    <li>Clips that overlap another simulated sound are excluded (2,400 clips). Only 104 positive clips remain, so the positive sample is almost all of them.</li></ul></div></div>
+  <div class="item"><div class="num">3</div><div class="body"><h2>Three inputs from you</h2><ul>
+    <li>Your <code>hypotheses.json</code>. I used a reconstructed draft and labeled every result as draft.</li>
+    <li>Permission to keep <code>event_study.py</code> and <code>placebo_hypothesis_analysis.py</code> in the repository.</li>
+    <li>Whether <code>Sim Relative Time</code> 0 is the start or the middle of the playback.</li></ul></div></div>
+  <div class="footer"><span>Playback Experiment: Progress Review</span><span>6</span></div>
+</section>
+
+<section class="slide">
+  <p class="kicker">Issues and next steps</p>
+  <h1>Three issues and my plan for each</h1>
+  <div class="item"><div class="num">1</div><div class="body"><h2>The baselines are thin</h2><ul>
+    <li><b>Issue:</b> Audio_Moth_5 and 6 hold 16 of 29 events and have no presence-free days. The baseline also includes the event's own day.</li>
+    <li><b>Next:</b> Run the leave-own-day-out check. Ask for recordings from days without playback at those sites.</li></ul></div></div>
+  <div class="item"><div class="num">2</div><div class="body"><h2>The model fits are fragile</h2><ul>
+    <li><b>Issue:</b> 31 of 72 fits used the fallback optimizer, and one had no valid standard error. The plan lists a count model that is not fitted yet.</li>
+    <li><b>Next:</b> Fit the count model and the leave-one-recorder-out refit. Report them even if they disagree.</li></ul></div></div>
+  <div class="item"><div class="num">3</div><div class="body"><h2>Two steps need other inputs</h2><ul>
+    <li><b>Issue:</b> The listening review needs the audio folder. The final report needs your hypotheses file.</li>
+    <li><b>Next:</b> Finish the review. Add a go, no-go, or hold recommendation to the report. Hand the verdict to the team for the December LODO comparison.</li></ul></div></div>
+  <div class="footer"><span>Playback Experiment: Progress Review</span><span>7</span></div>
+</section>
+
+<section class="slide big">
+  <p class="kicker">Repository</p>
+  <h1>Everything is in GitHub and reproducible</h1>
+  <ul>
+    <li><b>Link:</b> <a href="https://github.com/ratyagi/toucanet-playback-sensitivity">github.com/ratyagi/toucanet-playback-sensitivity</a></li>
+    <li><b>Run it:</b> Steps 1 to 11 in <code>README.md</code> rebuild every table, figure, and the report. All seeds are fixed.</li>
+    <li><b>Plan and rules:</b> <code>PREREGISTRATION.md</code> (fixed first) and <code>DEVIATIONS.md</code> (every later change).</li>
+    <li><b>Results:</b> <code>REPORT.md</code> and <code>results/tables/</code>. Figures are in <code>results/figures/</code>.</li>
+    <li><b>Code and tests:</b> <code>src/</code> and <code>tests/</code>. The lead's two scripts are in <code>src/lead/</code>, unchanged.</li>
+    <li><b>Data:</b> The raw dataset is not in git because it is large. Its SHA-256 is in <code>reference/dataset_checksum.txt</code>.</li>
+  </ul>
+  <div class="stat">
+    <div><b>29</b><span>events rebuilt and checked</span></div>
+    <div><b>6</b><span>pre-registered variants</span></div>
+    <div><b>1,000</b><span>placebo draws, fixed seed</span></div>
+  </div>
+  <div class="footer"><span>Playback Experiment: Progress Review</span><span>8</span></div>
+</section>
+</body></html>
