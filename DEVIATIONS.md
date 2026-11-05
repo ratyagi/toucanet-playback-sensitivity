@@ -57,3 +57,26 @@ Changes to, or implementation choices within, `PREREGISTRATION.md` after it was 
   - The +2 to +6 min position stratum has only 324 usable negative clips, against 1,672 to 2,160 in the others, because other simulated sounds overlap that part of the window. Equal sampling (20 per stratum) therefore samples it about six times more heavily. Per-stratum audibility rates are unaffected, but an overall rate must be weighted. The key now carries an inverse sampling-fraction `weight`, and `analyze_listening.py` reports `share_yes_pool_weighted`. The Wilson interval belongs to the unweighted share only.
   - The pool therefore describes clips with no overlapping simulated sound. Audibility estimates do not transfer to the overlapped clips that were excluded.
   - The 22-vs-7 split is confounded with recorder: all 8 Audio_Moth_6 events and all 3 Audio_Moth_2 events have a detection, while 4 of the 7 events without one are on Audio_Moth_5. A recorder table (`yamnet_split_by_recorder.csv`) and an all-events row (`analysis = all_events`) were added so the 22 vs 7 is visible directly. It stays descriptive.
+
+## Week 4 addendum: secondary count model (specification fixed before fitting)
+
+Written and committed before any count model was run. The plan lists a count model with a recorded-minutes offset as the secondary cross-check. Weeks 2 to 4 only fit linear models, so this closes that gap. It is exploratory and cannot change the verdict, which stays with the pre-registered call-rate model.
+
+**Specification (one model per window, no alternatives)**
+- Data: the 15-minute bins from `results/intermediate/bin_descriptors.csv` (detection count, recorded minutes, time-of-day bin, date, event-contamination flag).
+- Outcome: detection count per bin.
+- Rows: bins of the 10 primary isolated events with a usable contrast in variant 1, plus all clean bins (no simulated component from -10 to +60 min) as the baseline.
+- Terms: recorder fixed effects, time-of-day harmonics (24 h and 12 h sine and cosine), a pre-window indicator (-60 to 0 min), a post-window indicator.
+- Family: negative binomial (NB2), log link, offset = log(recorded minutes), dispersion estimated by maximum likelihood.
+- Standard errors: clustered by recorder and date.
+- Effect: rate ratio for the post-window indicator, with 95% interval, two-sided p, and the rate-ratio detectable at that standard error.
+- Windows: 0 to 60 min (variant 1) and 15 to 60 min (variant 2). No other windows.
+
+**Why this and not a random-intercept count model**
+- The pinned statsmodels has no negative binomial mixed model, and 6 recorders are too few to estimate a random effect well. Recorder fixed effects with clustered standard errors are the stable equivalent.
+- Time-of-day harmonics and clean baseline bins play the role of the recorder-by-time-of-day baseline in the linear model. Without them, a raw pre/post count comparison would confound response with the daily cycle.
+
+**Rules for reporting**
+- If a fit does not converge, it is reported as not estimable. No other family, window, or terms are tried afterward.
+- Both fits are reported whether or not they agree with the linear model.
+- The README item stays unchecked until the result is committed.
