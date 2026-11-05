@@ -1,0 +1,8 @@
+# Versions first used on Python 3.10.12. Confirmed to install and import on Python 3.12 (Windows).
+# Python 3.14 is not supported by these pinned versions. Use Python 3.12.
+# Install into a fresh virtual environment: pip install -r requirements.txt
+pandas==2.3.3
+numpy==2.2.6
+matplotlib==3.10.9
+scipy==1.15.3
+statsmodels==0.15.0

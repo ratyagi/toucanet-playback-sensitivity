@@ -1,0 +1,10 @@
+{
+  "_note": "Draft reconstructed from placebo_hypothesis_analysis.py and its report text. Replace with the lead's hypotheses.json when received.",
+  "bin_minutes": 15,
+  "pre_window": {"start_minutes": -60, "end_minutes_exclusive": 0},
+  "post_window": {"start_minutes": 0, "end_minutes_exclusive": 60},
+  "hypotheses": [
+    {"name": "primary_call_rate_drop_0_60m", "metric": "call_rate", "alternative": "less"},
+    {"name": "secondary_taxa_count_drop_0_60m", "metric": "taxa_count", "alternative": "less"}
+  ]
+}

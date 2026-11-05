@@ -1,0 +1,62 @@
+recorder,event_type,onset,support_clips,is_presence,event_id
+Audio_Moth_1,Vehicle,2025-03-18 17:14:18,101,False,event_001
+Audio_Moth_1,Human Presence on Trail,2025-03-19 07:35:52,400,True,event_002
+Audio_Moth_1,Vehicle,2025-03-19 07:37:27,101,False,event_003
+Audio_Moth_1,Human Presence on Trail,2025-03-19 17:24:38,400,True,event_004
+Audio_Moth_1,Vehicle,2025-03-19 17:25:35,100,False,event_005
+Audio_Moth_2,Human Presence on Trail,2025-03-18 17:00:18,400,True,event_006
+Audio_Moth_2,Human Presence on Trail,2025-03-19 07:51:29,400,True,event_007
+Audio_Moth_2,Vehicle,2025-03-19 07:52:41,100,False,event_008
+Audio_Moth_2,Human Presence on Trail,2025-03-19 17:13:52,401,True,event_009
+Audio_Moth_2,Chainsaw,2025-03-19 17:14:50,100,False,event_010
+Audio_Moth_3,Human Presence off Trail,2025-03-19 08:01:54,100,True,event_011
+Audio_Moth_3,Human Presence on Trail,2025-03-19 17:08:42,400,True,event_012
+Audio_Moth_3,Gunshot,2025-03-19 17:09:30,100,False,event_013
+Audio_Moth_4,Gunshot,2025-03-18 16:26:38,100,False,event_014
+Audio_Moth_4,Human Presence on Trail,2025-03-19 08:38:53,400,True,event_015
+Audio_Moth_4,Vehicle,2025-03-19 08:39:48,101,False,event_016
+Audio_Moth_4,Human Presence on Trail,2025-03-19 16:47:27,379,True,event_017
+Audio_Moth_4,Vehicle,2025-03-19 16:48:20,100,False,event_018
+Audio_Moth_4,Human Presence on Trail,2025-03-20 16:40:12,400,True,event_019
+Audio_Moth_4,Gunshot,2025-03-20 16:42:51,100,False,event_020
+Audio_Moth_4,Human Presence on Trail,2025-03-20 17:24:01,401,True,event_021
+Audio_Moth_4,Gunshot,2025-03-20 17:25:01,101,False,event_022
+Audio_Moth_4,Human Presence on Trail,2025-03-21 08:28:14,400,True,event_023
+Audio_Moth_4,Vehicle,2025-03-21 08:30:37,100,False,event_024
+Audio_Moth_4,Chainsaw,2025-03-21 08:31:17,100,False,event_025
+Audio_Moth_4,Human Presence on Trail,2025-03-21 14:00:52,296,True,event_026
+Audio_Moth_4,Vehicle,2025-03-21 14:01:47,78,False,event_027
+Audio_Moth_5,Human Presence on Trail,2025-03-17 16:52:47,400,True,event_028
+Audio_Moth_5,Gunshot,2025-03-17 16:53:57,101,False,event_029
+Audio_Moth_5,Chainsaw,2025-03-17 16:55:56,100,False,event_030
+Audio_Moth_5,Human Presence on Trail,2025-03-18 16:14:29,400,True,event_031
+Audio_Moth_5,Human Presence on Trail,2025-03-19 08:53:47,401,True,event_032
+Audio_Moth_5,Vehicle,2025-03-19 08:54:40,100,False,event_033
+Audio_Moth_5,Human Presence on Trail,2025-03-19 16:34:06,349,True,event_034
+Audio_Moth_5,Chainsaw,2025-03-19 16:35:02,100,False,event_035
+Audio_Moth_5,Human Presence on Trail,2025-03-20 16:26:06,400,True,event_036
+Audio_Moth_5,Chainsaw,2025-03-20 16:27:14,101,False,event_037
+Audio_Moth_5,Human Presence on Trail,2025-03-20 17:36:24,400,True,event_038
+Audio_Moth_5,Gunshot,2025-03-20 17:37:58,100,False,event_039
+Audio_Moth_5,Human Presence off Trail,2025-03-21 08:39:57,101,True,event_040
+Audio_Moth_5,Chainsaw,2025-03-21 08:40:52,100,False,event_041
+Audio_Moth_5,Gunshot,2025-03-21 08:41:39,101,False,event_042
+Audio_Moth_5,Human Presence on Trail,2025-03-21 13:42:34,337,True,event_043
+Audio_Moth_5,Gunshot,2025-03-21 13:43:35,100,False,event_044
+Audio_Moth_5,Vehicle,2025-03-21 13:46:45,54,False,event_045
+Audio_Moth_6,Human Presence on Trail,2025-03-17 16:37:27,400,True,event_046
+Audio_Moth_6,Vehicle,2025-03-17 16:39:32,101,False,event_047
+Audio_Moth_6,Human Presence on Trail,2025-03-18 16:02:19,401,True,event_048
+Audio_Moth_6,Human Presence on Trail,2025-03-19 09:07:14,400,True,event_049
+Audio_Moth_6,Vehicle,2025-03-19 09:07:57,100,False,event_050
+Audio_Moth_6,Human Presence on Trail,2025-03-19 16:23:25,400,True,event_051
+Audio_Moth_6,Gunshot,2025-03-19 16:24:26,101,False,event_052
+Audio_Moth_6,Human Presence on Trail,2025-03-20 16:06:52,400,True,event_053
+Audio_Moth_6,Gunshot,2025-03-20 16:11:03,100,False,event_054
+Audio_Moth_6,Human Presence on Trail,2025-03-20 17:48:02,401,True,event_055
+Audio_Moth_6,Gunshot,2025-03-20 17:48:44,101,False,event_056
+Audio_Moth_6,Human Presence on Trail,2025-03-21 08:51:47,401,True,event_057
+Audio_Moth_6,Chainsaw,2025-03-21 08:52:30,100,False,event_058
+Audio_Moth_6,Vehicle,2025-03-21 08:53:14,101,False,event_059
+Audio_Moth_6,Human Presence on Trail,2025-03-21 13:18:56,268,True,event_060
+Audio_Moth_6,Gunshot,2025-03-21 13:20:50,30,False,event_061

@@ -88,6 +88,38 @@ Statistics:
 - **Power:** only 7 events have no YAMNet detection. That comparison stays exploratory.
 - **Baseline code:** not yet located. Needed before week 2.
 
+## How to reproduce
+
+Run from the repo root in PowerShell. The raw dataset is not in git and lives in the parent `KWF_Toucanet` folder. The team lead's scripts are in `src/lead/`.
+
+1. Create the environment (Python 3.12; the pinned versions do not install on 3.14):
+   ```
+   py -3.12 -m venv .venv
+   .venv\Scripts\python -m pip install -r requirements.txt
+   ```
+2. Confirm you hold the same dataset (recorded checksum is in `reference/dataset_checksum.txt`):
+   ```
+   .venv\Scripts\python src\verify_dataset.py ..\bioacoustics_dataset.csv
+   ```
+3. Rebuild events, bins, baselines, and the control audit:
+   ```
+   .venv\Scripts\python src\lead\event_study.py --dataset ..\bioacoustics_dataset.csv --output-dir results\intermediate --skip-embeddings
+   ```
+   Check: `results\intermediate\events.csv` matches `reference\events.csv` (`fc.exe`; ignore line-ending differences), and `audit_report.md` reports 29 human-presence onsets.
+4. Run the contrast, model, and placebo script (needs a hypotheses file; the draft is `configs/hypotheses_draft.json`):
+   ```
+   .venv\Scripts\python src\lead\placebo_hypothesis_analysis.py --input-dir results\intermediate --output-dir results\intermediate\placebo --hypotheses configs\hypotheses_draft.json
+   ```
+   Check: primary isolated call-rate estimate near -0.41 with 10 events and 6 recorders, matching `reference/mixed_effects_results.csv`.
+
+5. Derive each event's labeled span and YAMNet detection count:
+   ```
+   .venv\Scripts\python src\derive_event_spans.py --dataset ..\bioacoustics_dataset.csv --events reference\events.csv --output reference\event_spans.csv
+   ```
+   Check: it reports 61 events matched, 29 human-presence events, 22 of 29 with a YAMNet detection, and 168 YAMNet-positive clips.
+
+Seeds are fixed in the scripts (placebo default 20251002). Results in `results/intermediate/` are regenerated, never edited by hand. Choices fixed before analysis are in `PREREGISTRATION.md`; later changes go in `DEVIATIONS.md`.
+
 ## Data
 
 Raw data is not committed (large files, gitignored).
