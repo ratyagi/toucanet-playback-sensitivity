@@ -75,9 +75,10 @@ Statistics:
 - Result: the gate fails (variant 1, two-sided p = 0.64), so the verdict is **inconclusive** and the other variants are descriptive.
 
 ### Week 5: Diagnostics
-- [ ] Plot YAMNet score, call rate, taxa count around each event.
-- [ ] Exploratory split: 22 events with a YAMNet detection vs. 7 without. Descriptive only.
-- [ ] Manual listening on a stratified sample of YAMNet-positive and -negative clips. Fix the sample size up front.
+- [x] Plot YAMNet-positive clips, call rate, and taxa count around each human-presence event (`results/figures/event_diagnostics_<recorder>.png`).
+- [x] Exploratory split: 22 events with a YAMNet detection vs. 7 without. Descriptive only (`results/tables/yamnet_split_events.csv`, `yamnet_split_summary.csv`, `yamnet_split_by_recorder.csv`). The split is confounded with recorder.
+- [x] Listening sample drawn with a fixed seed (100 YAMNet-positive, 100 YAMNet-negative; `results/listening/`). Note the positive pool has only 104 clips.
+- [ ] Blind listening review done by a reviewer, then summarised with `src/analyze_listening.py`.
 
 ### Week 6: Write-up
 - [ ] One results table: variant x effect size x interval x N.
@@ -141,6 +142,20 @@ Run from the repo root in PowerShell. The raw dataset is not in git and lives in
    .venv\Scripts\python src\decision.py
    ```
    Output: `results\tables\decision_summary.csv` (verdict per variant and an OVERALL row) and `results\tables\recorder_coverage.csv`.
+
+9. Week 5 diagnostics (needs steps 3 to 6 first):
+   ```
+   .venv\Scripts\python tests\test_diagnostics.py
+   .venv\Scripts\python src\run_diagnostics.py --dataset ..\bioacoustics_dataset.csv
+   ```
+   Output: six figures in `results\figures\` and `results\tables\yamnet_split_events.csv`, `yamnet_split_summary.csv`, `yamnet_split_by_recorder.csv`.
+
+10. Draw the blind listening sample:
+   ```
+   .venv\Scripts\python tests\test_listening.py
+   .venv\Scripts\python src\listening_sample.py --dataset ..\bioacoustics_dataset.csv
+   ```
+   Output: `results\listening\review_sheet.csv` (for the reviewer) and `sample_key.csv` (labels and positions; keep it away from the reviewer). With the audio folder at hand, `src\prepare_listening_audio.py --audio-dir <wav folder> --output-dir <reviewer folder>` copies the clips under neutral names (L001.wav ...). After the review, `src\analyze_listening.py --sheet <completed sheet>` writes `results\tables\listening_summary.csv`.
 
 Seeds are fixed in the scripts (placebo default 20251002). Results in `results/intermediate/` are regenerated, never edited by hand. Choices fixed before analysis are in `PREREGISTRATION.md`; later changes go in `DEVIATIONS.md`.
 
