@@ -81,8 +81,8 @@ Statistics:
 - [ ] Blind listening review done by a reviewer, then summarised with `src/analyze_listening.py`.
 
 ### Week 6: Write-up
-- [ ] One results table: variant x effect size x interval x N.
-- [ ] One-page verdict using the criteria above.
+- [x] One results table: variant x effect size x interval x N (`results/tables/results_table.csv`).
+- [x] One-page verdict using the criteria above (`REPORT.md`, generated from the tables; draft until the listening review and the lead's hypotheses file arrive).
 - [ ] Feed the verdict into the December LODO comparison and recommendation.
 
 ## Open issues
@@ -156,6 +156,13 @@ Run from the repo root in PowerShell. The raw dataset is not in git and lives in
    .venv\Scripts\python src\listening_sample.py --dataset ..\bioacoustics_dataset.csv
    ```
    Output: `results\listening\review_sheet.csv` (for the reviewer) and `sample_key.csv` (labels and positions; keep it away from the reviewer). With the audio folder at hand, `src\prepare_listening_audio.py --audio-dir <wav folder> --output-dir <reviewer folder>` copies the clips under neutral names (L001.wav ...). After the review, `src\analyze_listening.py --sheet <completed sheet>` writes `results\tables\listening_summary.csv`.
+
+11. Build the results table and the report (reads existing tables only; needs steps 8 and 9 first):
+   ```
+   .venv\Scripts\python tests\test_report.py
+   .venv\Scripts\python src\make_report.py
+   ```
+   Output: `results\tables\results_table.csv` and `REPORT.md`.
 
 Seeds are fixed in the scripts (placebo default 20251002). Results in `results/intermediate/` are regenerated, never edited by hand. Choices fixed before analysis are in `PREREGISTRATION.md`; later changes go in `DEVIATIONS.md`.
 
