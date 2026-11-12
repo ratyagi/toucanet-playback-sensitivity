@@ -1,67 +1,97 @@
 # toucanet-playback-sensitivity
 
-Tests whether the apparent acoustic response to simulated human presence is a biological change in animal vocal activity, or just the playback sound being picked up in the recordings.
+Tests whether the apparent acoustic response to simulated human presence is a biological change in animal vocal activity, or the sound of the simulated event itself being picked up in the recordings.
 
 Part of Team Toucanet (Kashmir World Foundation), Fall 2026. Feeds Fall Plan next step 2 (stability vs. ecological interpretability) and the December go/no-go on the current embedding paradigm.
 
+**Status (November 12, 2026):** analysis for Weeks 1 to 6 is complete and committed. The pre-registered verdict is **inconclusive**. The lead's feedback of November 12 is built into the plan below (Weeks 7 to 12). The result is not yet ready to support a biological-versus-direct-sound conclusion.
+
 ## Why this matters
 
-- If the effect disappears once playback and YAMNet-positive clips are excluded, the signal is mostly a human-sound detector, not an ecological response.
+- If the effect disappears once the event interval and YAMNet-positive clips are excluded, the signal is mostly a human-sound detector, not an ecological response.
 - That is a "no" on the interpretability question and affects any recommendation to scale the current pipeline.
 - YAMNet flags human sound in only 168 of 10,636 simulation clips (1.6%), but at least one detection falls in 22 of 29 events (76%).
-- Sparse within events, concentrated around them. A clip with no detection does not prove the playback was inaudible.
+- Detections are sparse within events and concentrated around them. A clip with no detection does not prove the event was inaudible.
 
 ## Research question
 
-Do estimated changes in animal acoustic activity persist after the playback period and after clips with detectable human-related sound are removed?
+Do estimated changes in animal acoustic activity persist after the labeled event interval and after clips with detectable human-related sound are removed?
+
+## What the simulation events are
+
+Source: the field team, as relayed by Daan, November 2026. The lead has not yet confirmed this wording.
+
+- Events were logged in the DeepData Capture app with a single timestamp, linked to one 3-second clip. `Sim Relative Time` was added during data processing. Time zero is the moment the simulation event took place. Negative time is before it, positive time is after it.
+- **Human presence (on trail and off trail):** real people were present. No sound was played. Effects on vocalizations are assumed from 600 seconds before to 600 seconds after time zero.
+- **Anthropogenic sound events:** a sound was played at time zero. Effects are assumed up to 300 seconds after.
+- Consequence for this repository: "playback" in the design document applies to the sound events. For the 29 human-presence events, the direct-sound question is whether the recorder hears the people themselves. Prose now says "after time zero" instead of "post-playback". Variant and config file names keep their original names so results stay traceable.
 
 ## Hypotheses
 
-- **Biological response:** call rate or taxa richness changes after exposure, and the change holds with playback and YAMNet-positive clips excluded.
-- **Direct sound:** the effect sits inside the playback interval, or disappears once positive and adjacent clips are removed.
+- **Biological response:** call rate or taxa count changes after exposure, and the change holds with the labeled interval and YAMNet-positive clips excluded.
+- **Direct sound:** the effect sits inside the labeled interval, or disappears once positive and adjacent clips are removed.
 - **Null:** changes around events match ordinary variation at matched placebo times.
+- The lead's `hypotheses.json` states the two tested hypotheses as drops (one-sided): call rate (primary) and taxa count (secondary) decrease in the 60 minutes after onset relative to the 60 minutes before.
 
 ## Analysis design
 
-- Exposure events: the 29 reconstructed human-presence events.
-- Baseline: existing recorder-specific, time-of-day baseline with matched placebo times.
-- Comparison: mean activity in each response window vs. the 60 minutes before onset.
-- Primary outcome: species-detection call rate per recorded minute (divide by recorded minutes, not clip count).
-- Secondary outcome: taxa count.
-- Recorder is a grouping effect.
-- Isolated events are primary. Events overlapping another event are a robustness analysis.
+- **Events:** 29 human-presence events, reconstructed as clip timestamp minus `Sim Relative Time`. Groups, fixed once from variant 1: **11 complete isolated, 11 complete overlapping, 7 incomplete** (path not fully recorded).
+  - Isolated: full -3 h to +12 h path recorded, no other human-presence onset inside it. Primary population.
+  - Overlapping: full path recorded, another human-presence onset inside it. Robustness population.
+  - The primary model uses 10 of the 11 isolated events, because one has no usable baseline.
+- **Baseline:** median of clean 15-minute bins for the same recorder and time of day. A bin is clean if no simulated component falls from 10 minutes before to 60 minutes after.
+- **Contrast per event:** mean baseline-adjusted value in the response window minus the mean in the 60 minutes before onset.
+- **Outcomes:** primary is species-detection call rate per recorded minute. Secondary is taxa count.
+- **Model:** random-intercept model on event contrasts, recorder as the grouping effect. Holm adjustment across the two outcomes.
+- **Gate:** variant 1, primary isolated call rate, two-sided p < 0.05. If it fails, the verdict is inconclusive and the other variants are descriptive. The lead's hypothesis is one-sided, so both p-values are reported. The gate fails under either (0.32 one-sided, 0.64 two-sided). Week 8 reconciles the two in the report.
+- **Placebo-in-time calibration:** 1,000 draws, fixed seed, strict and relaxed candidate pools. Exploratory, not part of the gate.
+- **Always reported:** effect sizes, 95% intervals, and the minimum detectable effect (about 1.96 times the standard error). N is small.
 
-| Variant | Window (min after onset) | Exclusion |
-|---|---|---|
-| 1. Original | 0-60 | none |
-| 2. Post-playback | 20-60 (or documented playback end to 60) | none |
-| 3. Buffered | 30-60 | none |
-| 4a. Original, detection-excluded | 0-60 | clips with `Human Activity != "no"` + next 5 min |
-| 4b. Post-playback, detection-excluded | 20-60 | same as above |
-
-Statistics:
-- Primary: per-event (post rate minus pre rate), compared against the placebo delta distribution with a permutation test.
-- Secondary: mixed-effects count model, recorder random intercept, log recorded minutes as offset.
-- Report effect sizes and intervals, not only p-values. N is small.
+| Variant | Response window (minutes after time zero) | Exclusion | Config |
+|---|---|---|---|
+| 1. Original | 0-60 | none | `v1_original` |
+| 2. After the labeled interval | 15-60 | none | `v2_post_playback` |
+| 2b. As written in the design document | 20-60, 5-minute bins | none | `v2b_post_playback_5min` |
+| 3. Buffered | 30-60 | none | `v3_buffered` |
+| 4a. Original, detection-excluded | 0-60 | `Human Activity != "no"` clips and clips within 300 s after one, same recorder | `v4a_original_excluded` |
+| 4b. After the labeled interval, detection-excluded | 15-60 | same as 4a | `v4b_post_playback_excluded` |
+| 4c. As written in the design document, detection-excluded (planned, Week 8) | 20-60, 5-minute bins | same as 4a | `v4c_...` |
 
 ## Interpretation criteria
 
-- **Biological:** direction and rough size of the effect stay consistent across post-playback, buffered, and detection-excluded variants, and are unusual vs. placebo.
-- **Direct contamination:** effect present at 0-60 but much smaller, reversed, or gone in the other variants. A larger effect among events with many YAMNet detections also points here.
-- **Inconclusive:** wide intervals across all variants. Report as inconclusive, never as "no effect".
+Fixed in `PREREGISTRATION.md`. The design document gives no numeric thresholds, so these were set in advance.
+
+- **Biological response:** all comparison variants consistent with variant 1 (same sign, ratio of at least 0.5), and the variant 2 estimate outside the 95% placebo range where a placebo exists.
+- **Direct contamination:** at least two comparison variants substantially smaller (ratio between 0 and 0.5) or reversed.
+- **Inconclusive:** the gate fails, or the pattern fits neither interpretation. Never reported as "no effect".
+- Adding variant 4c changes "five comparison variants" to six. This is logged in `DEVIATIONS.md` (Week 8).
+
+## Lead feedback of November 12, 2026 and where each point is handled
+
+| Instruction | Week |
+|---|---|
+| Run the negative binomial model, leave-own-day-out baseline, and leave-one-recorder-out as exploratory checks. Clustered standard errors may be unstable with 6 recorders and 5 dates. None can change the primary verdict. | 9 |
+| Listening review: document exclusions and sampling weights. Call the positive sample nearly a census. Have a second person review a subset independently if feasible. | 10 |
+| Keep `event_study.py` and `placebo_hypothesis_analysis.py`, with provenance and any modifications documented. | 7 |
+| Do not call later windows "post-playback" until `Sim Relative Time` is confirmed. Relayed answer received; the lead will confirm. | 7 |
+| Reconcile the two-sided decision rule with the one-sided hypothesis. | 8 |
+| Distinguish adjusted from unadjusted p-values. | 8 |
+| Run the exact 20-60 minute detection-excluded analysis, or document the 15-60 substitution as a deviation. Decision: run it as variant 4c. | 8 |
+| Describe event groups as 11 complete isolated, 11 complete overlapping, 7 incomplete. | 7 |
+| Receive `hypotheses.json`. Received; not yet added to the repository. | 7 |
 
 ## Plan
 
 ### Week 1: Inputs and setup
-- [x] Collect: `bioacoustics_dataset.csv`, existing baseline and matched-placebo code, the 29 event onset times, field-record playback end times.
+- [x] Collect: `bioacoustics_dataset.csv`, existing baseline and matched-placebo code, the 29 event onset times. No field records of event end times exist: events were logged as single timestamps.
 - [x] Reproduce the existing 0-60 estimate. Do not move on until it matches.
-- [x] Check all timestamps (dataset and field records) are in one timezone.
+- [x] Check all timestamps are in one timezone (UTC-06:00 for all clips; no second time source exists).
 - [x] Commit `PREREGISTRATION.md` (windows, exclusions, primary outcome, criteria) before running any variant.
 
 ### Week 2: Windows as config
 - [x] One config per variant (`configs/variants/`) and a runner (`src/run_variants.py`) that takes window spec + exclusion rule and returns the contrasts and models.
 - [x] YAMNet exclusion filter (`src/exclusion.py`, tested in `tests/`).
-- [x] All 6 variants implemented (the 5 in the table plus 2b: 20-60 at 5-minute bins). Variant 1 reproduces the reference results.
+- [x] Six variants implemented (1, 2, 2b, 3, 4a, 4b). Variant 1 reproduces the reference results.
 
 ### Week 3: Placebo matching and event types
 - [x] Define placebo exclusions (strict pool as primary, relaxed pool as sensitivity) and apply to every variant, with position-matched clip drops in the detection-excluded variants.
@@ -69,28 +99,82 @@ Statistics:
 - [x] Log usable events, clips, and recorders left under every rule (`results/tables/placebo_pool_summary.csv`, `variant_effort_summary.csv`).
 
 ### Week 4: Models
-- [x] Event-level delta + placebo permutation test (primary): the pre-registered decision rules are applied in `src/decision.py` to the Week 2 models and Week 3 placebo tables (`results/tables/decision_summary.csv`).
-- [ ] Mixed-effects **count** model (secondary, cross-check, log recorded minutes as offset). Not done: the Week 2 models are linear mixed models on the baseline-adjusted deviation (call rate and taxa count). The linear fits are reported next to the placebo result with the minimum detectable effect on every row, but they are not the count model in the plan. See `DEVIATIONS.md`.
+- [x] Pre-registered decision rules applied in `src/decision.py` to the Week 2 models and Week 3 placebo tables (`results/tables/decision_summary.csv`).
 - [x] Per-recorder view of the primary test (`results/tables/recorder_coverage.csv`).
-- Result: the gate fails (variant 1, two-sided p = 0.64), so the verdict is **inconclusive** and the other variants are descriptive.
+- [x] Result: the gate fails (variant 1, two-sided p = 0.64), so the verdict is **inconclusive** and the other variants are descriptive.
+- [ ] Count model (secondary): specification fixed in `DEVIATIONS.md` before fitting. Carried to Week 9.
 
 ### Week 5: Diagnostics
 - [x] Plot YAMNet-positive clips, call rate, and taxa count around each human-presence event (`results/figures/event_diagnostics_<recorder>.png`).
-- [x] Exploratory split: 22 events with a YAMNet detection vs. 7 without. Descriptive only (`results/tables/yamnet_split_events.csv`, `yamnet_split_summary.csv`, `yamnet_split_by_recorder.csv`). The split is confounded with recorder.
-- [x] Listening sample drawn with a fixed seed (100 YAMNet-positive, 100 YAMNet-negative; `results/listening/`). Note the positive pool has only 104 clips.
-- [ ] Blind listening review done by a reviewer, then summarised with `src/analyze_listening.py`.
+- [x] Exploratory split: 22 events with a YAMNet detection vs. 7 without. Descriptive only, confounded with recorder (`results/tables/yamnet_split_*.csv`).
+- [x] Listening sample drawn with a fixed seed (100 YAMNet-positive, 100 YAMNet-negative; `results/listening/`) and a review protocol (`results/listening/PROTOCOL.md`).
+- [ ] Blind listening review. Carried to Week 10.
 
-### Week 6: Write-up
+### Week 6: Write-up (first version)
 - [x] One results table: variant x effect size x interval x N (`results/tables/results_table.csv`).
-- [x] One-page verdict using the criteria above (`REPORT.md`, generated from the tables; draft until the listening review and the lead's hypotheses file arrive).
-- [ ] Feed the verdict into the December LODO comparison and recommendation.
+- [x] One-page draft verdict (`REPORT.md`, generated from the tables).
+- [x] Progress review deck (`docs/`), sent to the lead. Feedback received November 12.
+- [x] Specifications for the leakage and leave-one-recorder-out checks fixed in `DEVIATIONS.md` before running.
+
+### Week 7: Feedback intake and inputs
+- [ ] Add the lead's `hypotheses.json` to `configs/` unmodified. Rerun steps 3 to 11 with it. Compare with the draft run table by table and log any difference in `DEVIATIONS.md`. Expected: identical, because the windows match.
+- [ ] Remove DRAFT labels from the report and tables once the comparison is clean.
+- [ ] Record the field team's description of `Sim Relative Time` in `PREREGISTRATION.md` and `DEVIATIONS.md`. Replace "post-playback" and "playback interval" in prose with "after time zero" and "labeled interval". Mark it as awaiting the lead's confirmation.
+- [ ] Write `src/lead/PROVENANCE.md`: who supplied each script, the date, the SHA-256, and a statement that it is unmodified and imported as is. Do the same for the files in `reference/`.
+- [ ] Use the group names "11 complete isolated, 11 complete overlapping, 7 incomplete" in every document. State that the primary model uses 10 of the 11 isolated events.
+- **Done when:** every table regenerates from the lead's hypotheses file, and the comparison with the draft run is documented.
+
+### Week 8: Decision rules, p-values, and variant 4c
+- [ ] Add variant 4c (20-60 minutes, 5-minute bins, YAMNet-excluded). Config, run, and placebo calibration. Log it as an addition after feedback, with the reason.
+- [ ] Update the decision rule from five to six comparison variants. Update `src/decision.py` and its tests. Log it as a deviation. The gate still fails, so the verdict does not change.
+- [ ] Report the one-sided p (the lead's hypothesis) and the two-sided p side by side in `results_table.csv` and `REPORT.md`. State which one the gate uses and why. Show that the gate fails under both.
+- [ ] Label every p-value as unadjusted or adjusted. Model p-values: Holm across the two outcomes. Placebo p-values: unadjusted, plus Holm across the variants.
+- [ ] Add an event-count table (29 events by group, usable events per variant).
+- **Done when:** the report shows each p-value with its type, and the tests cover the six-variant rule.
+
+### Week 9: Exploratory robustness checks
+All three are exploratory and cannot change the verdict. Specifications are fixed in `DEVIATIONS.md` (Week 4 and Week 6 addenda).
+- [ ] **Negative binomial count model:** recorded-minutes offset, recorder fixed effects, time-of-day harmonics, standard errors clustered by recorder and date. Windows 0-60 and 15-60. Test the code on simulated data first. Report non-convergence as not estimable.
+- [ ] **Leave-own-day-out baseline:** report how many events keep a usable contrast.
+- [ ] **Leave-one-recorder-out:** refit variants 1 and 2 six times. Flag a recorder as influential if dropping it flips the sign or crosses p = 0.05.
+- [ ] State in the report that clustered standard errors may be unstable with 6 recorders and 5 dates.
+- **Done when:** three result tables are committed in `results/tables/`, each with a convergence or estimability flag, and the tests pass.
+
+### Week 10: Listening review
+- [ ] Document the exclusions (2,400 overlapped clips, 63 of 167 positive clips, off-trail events) and the sampling weights in `results/listening/PROTOCOL.md` and the report.
+- [ ] Describe the positive sample as nearly a census: 100 of 104 eligible clips, 75 of 104 from Audio_Moth_6, none from Audio_Moth_3.
+- [ ] Get the audio files. Run `src/prepare_listening_audio.py`. Fix any missing clips before listening.
+- [ ] Adjust the rubric wording for presence events: audible sound made by people who were present.
+- [ ] Review all 200 clips blind to the label and the position. Do not edit answers after the summary is seen.
+- [ ] Second reviewer: an independent person reviews a fixed subset (proposed: 50 clips, stratified, drawn with the fixed seed by script before either review). Report percent agreement and Cohen's kappa. Record how disagreements are handled.
+- [ ] Run `src/analyze_listening.py`. Report weighted and unweighted shares, with "unsure" shown separately.
+- **Done when:** `listening_summary.csv` and an agreement table are committed.
+
+### Week 11: Final report, deck, and reproducibility check
+- [ ] Regenerate `REPORT.md` with variant 4c, the p-value types, the exploratory checks, and the listening results.
+- [ ] Add the recommendation section: go, no-go, or hold, mapped from the verdict. State that the mapping was written after the verdict was known, and that it covers this experiment only, not the December decision.
+- [ ] Keep the statement that the result is not yet ready to support a biological-versus-direct-sound conclusion.
+- [ ] Update the limitations list: clustered standard errors, the `Sim Relative Time` answer, the off-trail window, and the thin baselines at Audio_Moth_5 and 6.
+- [ ] Rebuild the deck (`docs/`).
+- [ ] Reproducibility check: clone the repository into a clean folder, create the environment, run steps 1 to 11, and compare every table with the committed one.
+- **Done when:** the clean-clone run reproduces all tables, and the report has been read through once for accuracy.
+
+### Week 12: Handover
+- [ ] Send the final report and deck to the lead. Answer his follow-up on `Sim Relative Time` when it arrives, and update the documents if it differs from the relayed answer.
+- [ ] Tag the repository (for example `v1.0-report`) and push.
+- [ ] Hand the verdict to the team for the December LODO comparison. Ask the lead who collects it, since the Fall Plan names no owner.
+- [ ] List follow-up needs: more recording days at the Audio_Moth_5 and 6 sites and days without simulated events, so baselines exist.
+- **Done when:** the lead has signed off and the tag is pushed.
 
 ## Open issues
 
-- **Placebo exclusion gap:** placebo times have no playback, so YAMNet-positive clips are rare there, and "same exclusions" would only trim real-event windows. Proposed fix: drop the same relative clip positions (same minutes after onset) in matched placebo windows. Confirm with the team.
-- **Playback duration:** 20 minutes is approximate. Use field-record end times where they exist.
-- **Power:** only 7 events have no YAMNet detection. That comparison stays exploratory.
-- **Baseline code:** not yet located. Needed before week 2.
+- **`Sim Relative Time`:** the lead is confirming with the people who set up the experiment. Until then, later windows are described as "after time zero".
+- **Off-trail events:** the dataset labels the 2 off-trail events only from 0 to +5 minutes, but the field team's description assumes the same 600 seconds before and after as on-trail events. Ask which is intended.
+- **Thin baselines:** Audio_Moth_5 and 6 hold 16 of 29 events and have no presence-free days. The reference baseline also includes the event's own day. The leave-own-day-out check (Week 9) tests this.
+- **Placebo exclusion:** the position-matched drop was implemented and logged. Ask the team to confirm it.
+- **Fit stability:** 31 of 72 model fits used the optimizer fallback and one had no valid standard error. This is the lead's fitting code, unchanged.
+- **Listening review:** needs the audio files and a second reviewer.
+- **December LODO:** the Fall Plan names no owner for collecting this experiment's result.
 
 ## How to reproduce
 
@@ -110,7 +194,7 @@ Run from the repo root in PowerShell. The raw dataset is not in git and lives in
    .venv\Scripts\python src\lead\event_study.py --dataset ..\bioacoustics_dataset.csv --output-dir results\intermediate --skip-embeddings
    ```
    Check: `results\intermediate\events.csv` matches `reference\events.csv` (`fc.exe`; ignore line-ending differences), and `audit_report.md` reports 29 human-presence onsets.
-4. Run the contrast, model, and placebo script (needs a hypotheses file; the draft is `configs/hypotheses_draft.json`):
+4. Run the contrast, model, and placebo script (needs a hypotheses file; the draft is `configs/hypotheses_draft.json`, to be replaced by the lead's `hypotheses.json` in Week 7):
    ```
    .venv\Scripts\python src\lead\placebo_hypothesis_analysis.py --input-dir results\intermediate --output-dir results\intermediate\placebo --hypotheses configs\hypotheses_draft.json
    ```
@@ -173,23 +257,34 @@ Seeds are fixed in the scripts (placebo default 20251002). Results in `results/i
 ## Data
 
 Raw data is not committed (large files, gitignored).
-- `bioacoustics_dataset.csv`: clip-level data, includes the YAMNet `Human Activity` column.
-- `cleaned_df.csv`: cleaned version, confirm how it differs before using it.
+- `bioacoustics_dataset.csv`: clip-level data, includes the YAMNet `Human Activity` column. Checksum in `reference/dataset_checksum.txt`.
+- `cleaned_df.csv` was in the original folder but is not used here.
 
-## Planned layout
+## Repository layout
 
 ```
 toucanet-playback-sensitivity/
-  README.md
-  PREREGISTRATION.md
-  data/            # gitignored
-  configs/         # window and exclusion specs
-  src/             # window function, placebo matching, models
-  notebooks/       # diagnostics and plots
-  results/         # tables, figures
+  README.md  PREREGISTRATION.md  DEVIATIONS.md  REPORT.md
+  requirements.txt
+  configs/          # hypotheses file and one JSON per window variant
+  data/             # gitignored
+  docs/             # progress review deck (PDF and HTML source)
+  reference/        # lead's reference outputs, dataset checksum, event spans
+  results/
+    tables/         # all result tables
+    figures/        # per-recorder event diagnostics
+    listening/      # review protocol, blind sheet, sample key
+    intermediate/   # regenerated, gitignored
+  src/
+    lead/           # lead's scripts, unmodified
+    *.py            # variants, placebo, decision rules, diagnostics, listening, report
+  tests/            # unit tests for each module
+  notebooks/        # unused so far
 ```
 
 ## References
 
-- Playback Experiment (design doc)
+- Playback Experiment (design document)
 - Team Toucanet Fall Plan 2026
+- Lead's `hypotheses.json` (received November 12, 2026)
+- Lead feedback of November 12, 2026 and the field team's description of simulation events (relayed by Daan)
