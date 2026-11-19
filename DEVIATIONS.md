@@ -133,3 +133,33 @@ Written and committed before either check was run. Both are exploratory sensitiv
 
 - `src/lead/PROVENANCE.md` and `reference/PROVENANCE.md` record the origin, SHA-256, and modification status of the lead's scripts and the reference inputs. `tests/test_provenance.py` recomputes them. This meets the lead's condition for keeping his scripts.
 - Event groups are described everywhere as 11 complete isolated, 11 complete overlapping, and 7 incomplete. The primary model uses 10 of the 11 isolated events. `PREREGISTRATION.md` uses "isolated", "overlapping", and "incomplete" with the same meaning. The progress deck in `docs/` still uses the old wording and is rebuilt in Week 11.
+
+## 2026-11-19: Week 8 addendum: variant 4c and p-value labels (specification fixed before running)
+
+Written and committed before variant 4c was run. Responds to the lead's feedback of November 12, 2026.
+
+**Variant 4c: the exact 20 to 60 minute, YAMNet-excluded analysis**
+- Reason: the design document asks for 5-minute bins, a 20 to 60 minute window, and YAMNet-positive clips removed. Variant 4b used 15-minute bins and a 15 to 60 minute window as a substitution. 4c removes the substitution.
+- Config: `configs/variants/v4c_post_playback_5min_excluded.json`. Same as `v2b_post_playback_5min` (5-minute bins, pre window -60 to 0, post window 20 to 60) with `exclude_yamnet: true` and `yamnet_tail_seconds: 300`, as in 4a and 4b.
+- Everything else is unchanged: clean-bin definition, baseline, contrast, event set, lead's mixed model, both outcomes, one-sided direction.
+- Placebo: same procedure as the other variants (1,000 draws, seed 20251002, strict and relaxed pools, position-matched drops).
+- 4b stays in the repository and in the tables. It is no longer described as the exact design-document analysis.
+
+**Decision rule**
+- 4c is a sixth comparison variant. The rule text changes from "all five" to "all six" and from "at least two of the five" to "at least two of the six". The thresholds are otherwise unchanged.
+- The gate is variant 1 only. It fails (two-sided p = 0.637), so the verdict cannot change by adding 4c. The change only matters if the gate passes in later data.
+- The contamination threshold stays at two variants. With six compared variants instead of five, two small or reversed estimates are slightly easier to reach by chance. This is disclosed for the lead.
+- `PREREGISTRATION.md` still says "five". It is not edited. Read it as six from this entry on.
+- Variant results seen when written: yes for variants 1 to 4b, no for 4c.
+
+**P-value reporting**
+- Each result row shows the one-sided p (the hypothesis: a drop) and the two-sided p (the gate) side by side.
+- Adjusted and unadjusted are labeled in separate columns.
+  - Holm adjustment: across the two outcomes (call rate and taxa count) within one variant.
+  - Placebo p-values: unadjusted per variant, plus Holm across variants.
+- The gate uses the unadjusted two-sided p of the primary outcome in variant 1. It is a single pre-specified test.
+- The one-sided and two-sided tests were already fixed in `PREREGISTRATION.md`: the reference test is one-sided (drop), and two-sided p-values are used in the decision rules because the design document states its hypotheses as changes in either direction. `REPORT.md` now states both and says which one the gate uses. This is a reporting change. The gate is unchanged.
+- Holm adjustment across the two outcomes was already pre-registered. The change is that the adjusted p is now shown next to the unadjusted p. Holm across variants for the placebo p-values is new and exploratory.
+
+**Event-count table**
+- New table `results/tables/event_counts.csv`: the 29 events by group (11 complete isolated, 11 complete overlapping, 7 incomplete), and usable events per variant with the reason each event is dropped (no baseline, incomplete, overlapping).
