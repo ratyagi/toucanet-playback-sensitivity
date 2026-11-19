@@ -17,9 +17,9 @@ Rules, fixed in advance:
               consistent: same sign and ratio >= 0.5
               substantially_smaller: 0 < ratio < 0.5
               reversed: opposite sign
-  Biological response  all five variants consistent AND the variant 2 estimate lies outside
+  Biological response  all six variants consistent AND the variant 2 estimate lies outside
               the 95% strict-pool placebo range (where a placebo exists).
-  Direct contamination at least two of the five are substantially smaller or reversed.
+  Direct contamination at least two of the six are substantially smaller or reversed.
   Anything else: mixed, inconclusive.
 
   python src/decision.py
@@ -38,7 +38,7 @@ TABLES = REPO / "results" / "tables"
 
 GATE_VARIANT = "v1_original"
 COMPARED = ["v2_post_playback", "v2b_post_playback_5min", "v3_buffered",
-            "v4a_original_excluded", "v4b_post_playback_excluded"]
+            "v4a_original_excluded", "v4b_post_playback_excluded", "v4c_post_playback_5min_excluded"]
 PLACEBO_REFERENCE = "v2_post_playback"
 ALPHA = 0.05
 MIN_RATIO = 0.5
@@ -60,6 +60,14 @@ def classify_ratio(estimate: float, reference: float) -> str:
     return "substantially_smaller"
 
 
+def holm(p: pd.Series) -> pd.Series:
+    """Holm step-down adjustment of a set of p-values (NaN stays NaN)."""
+    valid = p.dropna().sort_values()
+    m = len(valid)
+    adjusted = (valid * (m - np.arange(m))).cummax().clip(upper=1.0)
+    return adjusted.reindex(p.index)
+
+
 def decide(model: pd.DataFrame, placebo: pd.DataFrame) -> pd.DataFrame:
     """model: one row per variant (estimate, standard_error, two_sided_p, n_events, ...).
     placebo: one row per variant (null_q025, null_q975, observed, p_two_sided, events), may be empty."""
@@ -79,6 +87,8 @@ def decide(model: pd.DataFrame, placebo: pd.DataFrame) -> pd.DataFrame:
             "n_recorders": int(m["n_recorders"]),
             "estimate": m["estimate"],
             "standard_error": m["standard_error"],
+            "one_sided_p": m.get("one_sided_p_less", np.nan),
+            "one_sided_p_holm_2_outcomes": m.get("holm_p", np.nan),
             "two_sided_p": m["two_sided_p"],
             "minimum_detectable_effect": m["minimum_detectable_effect"],
             "ratio_to_variant1": np.nan if variant == GATE_VARIANT else m["estimate"] / ref["estimate"],
@@ -96,6 +106,7 @@ def decide(model: pd.DataFrame, placebo: pd.DataFrame) -> pd.DataFrame:
                        placebo_q975=np.nan, placebo_p_two_sided=np.nan)
         rows.append(row)
     table = pd.DataFrame(rows)
+    table["placebo_p_two_sided_holm_across_variants"] = holm(table["placebo_p_two_sided"])
 
     if not gate_passed:
         verdict = "inconclusive_gate_not_passed"
@@ -111,7 +122,7 @@ def decide(model: pd.DataFrame, placebo: pd.DataFrame) -> pd.DataFrame:
         outside = has_placebo and not (pr["placebo_q025"] <= pr["estimate"] <= pr["placebo_q975"])
         if n_consistent == len(COMPARED) and (outside or not has_placebo):
             verdict = "biological_response"
-            reason = "All five variants consistent with variant 1" + (
+            reason = f"All {len(COMPARED)} variants consistent with variant 1" + (
                 "; variant 2 outside the 95% placebo range." if outside
                 else "; no placebo exists for variant 2, so this rests on consistency alone.")
         elif n_bad >= MIN_SMALLER_FOR_CONTAMINATION:

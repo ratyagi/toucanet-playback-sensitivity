@@ -31,29 +31,43 @@ def verdict(estimates, p_v1, plc):
 
 
 def test_gate_fails():
-    assert verdict([-2, -2, -2, -2, -2, -2], 0.64, placebo(-1, 1)) == "inconclusive_gate_not_passed"
-    t = d.decide(model([-2] * 6, 0.64), placebo(-1, 1))
+    assert verdict([-2] * 7, 0.64, placebo(-1, 1)) == "inconclusive_gate_not_passed"
+    t = d.decide(model([-2] * 7, 0.64), placebo(-1, 1))
     assert set(t.loc[t["variant"].isin(d.COMPARED), "comparison"]) == {"descriptive_only"}
 
 
 def test_gate_boundary():
-    assert verdict([-2] * 6, 0.05, placebo(-1, 1)) == "inconclusive_gate_not_passed"
+    assert verdict([-2] * 7, 0.05, placebo(-1, 1)) == "inconclusive_gate_not_passed"
 
 
 def test_biological():
-    assert verdict([-2, -2, -1.5, -1.2, -2.2, -1.8], 0.01, placebo(-1, 1)) == "biological_response"
+    assert verdict([-2, -2, -1.5, -1.2, -2.2, -1.8, -1.6], 0.01, placebo(-1, 1)) == "biological_response"
 
 
 def test_consistent_but_inside_placebo_is_mixed():
-    assert verdict([-2, -2, -1.5, -1.2, -2.2, -1.8], 0.01, placebo(-3, 3)) == "mixed_inconclusive"
+    assert verdict([-2, -2, -1.5, -1.2, -2.2, -1.8, -1.6], 0.01, placebo(-3, 3)) == "mixed_inconclusive"
 
 
 def test_contamination():
-    assert verdict([-2, -0.2, 0.5, -1.5, -1.5, -1.5], 0.01, placebo(-1, 1)) == "direct_contamination"
+    assert verdict([-2, -0.2, 0.5, -1.5, -1.5, -1.5, -1.5], 0.01, placebo(-1, 1)) == "direct_contamination"
 
 
 def test_one_smaller_is_mixed():
-    assert verdict([-2, -0.2, -1.5, -1.5, -1.5, -1.5], 0.01, placebo(-1, 1)) == "mixed_inconclusive"
+    assert verdict([-2, -0.2, -1.5, -1.5, -1.5, -1.5, -1.5], 0.01, placebo(-1, 1)) == "mixed_inconclusive"
+
+
+def test_variant_4c_is_compared():
+    assert "v4c_post_playback_5min_excluded" in d.COMPARED and len(d.COMPARED) == 6
+    # a smaller 4c counts toward contamination like any other compared variant
+    assert verdict([-2, -0.2, -1.5, -1.5, -1.5, -1.5, -0.2], 0.01, placebo(-1, 1)) == "direct_contamination"
+
+
+def test_holm():
+    p = pd.Series([0.01, 0.04, 0.03, np.nan], index=list("abcd"))
+    out = d.holm(p)
+    assert abs(out["a"] - 0.03) < 1e-12 and abs(out["c"] - 0.06) < 1e-12 and abs(out["b"] - 0.06) < 1e-12
+    assert np.isnan(out["d"])
+    assert (d.holm(pd.Series([0.6, 0.9])) == 1.0).all()
 
 
 def test_ratio_classes():

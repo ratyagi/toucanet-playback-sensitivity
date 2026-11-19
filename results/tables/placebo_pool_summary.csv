@@ -23,3 +23,7 @@ v4b_post_playback_excluded,strict,primary_isolated,11,5,4,Audio_Moth_5;Audio_Mot
 v4b_post_playback_excluded,strict,robustness_overlapping,11,4,3,Audio_Moth_5;Audio_Moth_6,4,4.0,4,2064.5
 v4b_post_playback_excluded,relaxed,primary_isolated,11,5,4,Audio_Moth_5;Audio_Moth_6,4,8.0,10,2094.0
 v4b_post_playback_excluded,relaxed,robustness_overlapping,11,8,5,,1,8.0,8,2100.0
+v4c_post_playback_5min_excluded,strict,primary_isolated,11,5,4,Audio_Moth_5;Audio_Moth_6,1,24.0,26,2000.0
+v4c_post_playback_5min_excluded,strict,robustness_overlapping,11,3,3,Audio_Moth_5;Audio_Moth_6,8,12.0,13,2000.0
+v4c_post_playback_5min_excluded,relaxed,primary_isolated,11,5,4,Audio_Moth_5;Audio_Moth_6,12,24.0,26,2000.0
+v4c_post_playback_5min_excluded,relaxed,robustness_overlapping,11,8,5,,3,24.0,26,2000.0

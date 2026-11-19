@@ -20,7 +20,7 @@ def build():
 
 def test_table_shape_and_interval():
     t = mr.results_table(pd.read_csv(T / "variant_results.csv"))
-    assert len(t) == 12  # 6 variants x 2 hypotheses
+    assert len(t) == 14  # 7 variants x 2 hypotheses
     assert ((t["ci_high"] - t["ci_low"]) / 2 / t["standard_error"] - 1.96).abs().max() < 1e-9
     assert (t["n_events"] > 0).all()
 

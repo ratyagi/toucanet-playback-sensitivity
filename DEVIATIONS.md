@@ -163,3 +163,18 @@ Written and committed before variant 4c was run. Responds to the lead's feedback
 
 **Event-count table**
 - New table `results/tables/event_counts.csv`: the 29 events by group (11 complete isolated, 11 complete overlapping, 7 incomplete), and usable events per variant with the reason each event is dropped (no baseline, incomplete, overlapping).
+
+## 2026-11-19: No second reviewer for the listening review
+
+- The lead's feedback of November 12 asked for an independent second person to review a subset "if feasible".
+- Decision, agreed with the lead on November 19, 2026: the experiment owner reviews all 200 clips alone. There is no second rater, so no agreement or kappa is reported.
+- Consequence: the listening result is single-rater and not independent. `results/listening/PROTOCOL.md` already names the owner as reviewer. The report states this limit. Blinding to the YAMNet label and the clip position is kept.
+- The listening review is descriptive and cannot change the verdict.
+
+## 2026-11-19: Week 8 results as run
+
+- Variant 4c was run with the committed spec. Primary isolated call rate: -0.58 calls per minute, 11 events, 6 recorders, two-sided p = 0.475, one-sided p = 0.238.
+- It is almost the same as variant 2b (-0.58, p = 0.476, 11 events). Removing the YAMNet clips changes few values because they are 0.9% of all clips.
+- Rerun check: the other six variants give identical rows in `variant_results.csv` and `placebo_results.csv` to the committed tables (largest difference 0.0).
+- The verdict is unchanged: inconclusive, gate p = 0.637.
+- Placebo-in-time for 4c: 5 events, observed +0.40, two-sided p = 0.040 unadjusted. After Holm across the 7 variants, no variant is below 0.05 (smallest 0.070). Exploratory.

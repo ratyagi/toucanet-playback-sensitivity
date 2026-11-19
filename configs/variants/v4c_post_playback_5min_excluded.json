@@ -1,0 +1,27 @@
+{
+  "name": "v4c_post_playback_5min_excluded",
+  "description": "Exact design-document analysis: 20 to 60 minutes, 5-minute bins, detection-excluded",
+  "bin_minutes": 5,
+  "pre_window": {
+    "start_minutes": -60,
+    "end_minutes_exclusive": 0
+  },
+  "post_window": {
+    "start_minutes": 20,
+    "end_minutes_exclusive": 60
+  },
+  "exclude_yamnet": true,
+  "yamnet_tail_seconds": 300,
+  "hypotheses": [
+    {
+      "name": "primary_call_rate",
+      "metric": "call_rate",
+      "alternative": "less"
+    },
+    {
+      "name": "secondary_taxa_count",
+      "metric": "taxa_count",
+      "alternative": "less"
+    }
+  ]
+}

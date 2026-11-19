@@ -4,7 +4,7 @@ Tests whether the apparent acoustic response to simulated human presence is a bi
 
 Part of Team Toucanet (Kashmir World Foundation), Fall 2026. Feeds Fall Plan next step 2 (stability vs. ecological interpretability) and the December go/no-go on the current embedding paradigm.
 
-**Status (November 19, 2026):** analysis for Weeks 1 to 6 is complete and committed. Week 7 inputs (the lead's hypotheses file, provenance, wording) are done. The pre-registered verdict is **inconclusive**. The lead's feedback of November 12 is built into the plan below (Weeks 7 to 12). The result is not yet ready to support a biological-versus-direct-sound conclusion.
+**Status (November 19, 2026):** analysis for Weeks 1 to 7 is complete and committed. Week 8 (variant 4c, p-value labels, event counts) is done and awaiting commit. The pre-registered verdict is **inconclusive**. The lead's feedback of November 12 is built into the plan below (Weeks 7 to 12). The result is not yet ready to support a biological-versus-direct-sound conclusion.
 
 ## Why this matters
 
@@ -71,7 +71,7 @@ Fixed in `PREREGISTRATION.md`. The design document gives no numeric thresholds, 
 | Instruction | Week |
 |---|---|
 | Run the negative binomial model, leave-own-day-out baseline, and leave-one-recorder-out as exploratory checks. Clustered standard errors may be unstable with 6 recorders and 5 dates. None can change the primary verdict. | 9 |
-| Listening review: document exclusions and sampling weights. Call the positive sample nearly a census. Have a second person review a subset independently if feasible. | 10 |
+| Listening review: document exclusions and sampling weights. Call the positive sample nearly a census. The experiment owner reviews all clips alone, agreed with the lead (November 19). The report states that the review is single-rater. | 10 |
 | Keep `event_study.py` and `placebo_hypothesis_analysis.py`, with provenance and any modifications documented. See `src/lead/PROVENANCE.md`. | 7 (done) |
 | Do not call later windows "post-playback" until `Sim Relative Time` is confirmed. Relayed answer recorded in `DEVIATIONS.md`; the lead will confirm. | 7 (done) |
 | Reconcile the two-sided decision rule with the one-sided hypothesis. | 8 |
@@ -126,11 +126,11 @@ Fixed in `PREREGISTRATION.md`. The design document gives no numeric thresholds, 
 - **Done when:** every table regenerates from the lead's hypotheses file, and the comparison with the draft run is documented. Met.
 
 ### Week 8: Decision rules, p-values, and variant 4c
-- [ ] Add variant 4c (20-60 minutes, 5-minute bins, YAMNet-excluded). Config, run, and placebo calibration. Log it as an addition after feedback, with the reason.
-- [ ] Update the decision rule from five to six comparison variants. Update `src/decision.py` and its tests. Log it as a deviation. The gate still fails, so the verdict does not change.
-- [ ] Report the one-sided p (the lead's hypothesis) and the two-sided p side by side in `results_table.csv` and `REPORT.md`. State which one the gate uses and why. Show that the gate fails under both.
-- [ ] Label every p-value as unadjusted or adjusted. Model p-values: Holm across the two outcomes. Placebo p-values: unadjusted, plus Holm across the variants.
-- [ ] Add an event-count table (29 events by group, usable events per variant).
+- [x] Add variant 4c (20-60 minutes, 5-minute bins, YAMNet-excluded). Config, run, and placebo calibration. Log it as an addition after feedback, with the reason.
+- [x] Update the decision rule from five to six comparison variants. Update `src/decision.py` and its tests. Log it as a deviation. The gate still fails, so the verdict does not change.
+- [x] Report the one-sided p (the lead's hypothesis) and the two-sided p side by side in `results_table.csv` and `REPORT.md`. State which one the gate uses and why. Show that the gate fails under both.
+- [x] Label every p-value as unadjusted or adjusted. Model p-values: Holm across the two outcomes. Placebo p-values: unadjusted, plus Holm across the variants.
+- [x] Add an event-count table (29 events by group, usable events per variant): `results/tables/event_counts.csv`, from `src/event_counts.py`.
 - **Done when:** the report shows each p-value with its type, and the tests cover the six-variant rule.
 
 ### Week 9: Exploratory robustness checks
@@ -147,9 +147,9 @@ All three are exploratory and cannot change the verdict. Specifications are fixe
 - [ ] Get the audio files. Run `src/prepare_listening_audio.py`. Fix any missing clips before listening.
 - [ ] Adjust the rubric wording for presence events: audible sound made by people who were present.
 - [ ] Review all 200 clips blind to the label and the position. Do not edit answers after the summary is seen.
-- [ ] Second reviewer: an independent person reviews a fixed subset (proposed: 50 clips, stratified, drawn with the fixed seed by script before either review). Report percent agreement and Cohen's kappa. Record how disagreements are handled.
+- [ ] Single reviewer, no second rater: the experiment owner reviews all 200 clips. This was agreed with the lead on November 19. State in the report that the review is not independent.
 - [ ] Run `src/analyze_listening.py`. Report weighted and unweighted shares, with "unsure" shown separately.
-- **Done when:** `listening_summary.csv` and an agreement table are committed.
+- **Done when:** `listening_summary.csv` is committed and the report states the single-reviewer limit.
 
 ### Week 11: Final report, deck, and reproducibility check
 - [ ] Regenerate `REPORT.md` with variant 4c, the p-value types, the exploratory checks, and the listening results.
@@ -174,7 +174,7 @@ All three are exploratory and cannot change the verdict. Specifications are fixe
 - **Thin baselines:** Audio_Moth_5 and 6 hold 16 of 29 events and have no presence-free days. The reference baseline also includes the event's own day. The leave-own-day-out check (Week 9) tests this.
 - **Placebo exclusion:** the position-matched drop was implemented and logged. Ask the team to confirm it.
 - **Fit stability:** 31 of 72 model fits used the optimizer fallback and one had no valid standard error. This is the lead's fitting code, unchanged.
-- **Listening review:** needs the audio files and a second reviewer.
+- **Listening review:** needs the audio files.
 - **December LODO:** the Fall Plan names no owner for collecting this experiment's result.
 
 ## How to reproduce
@@ -209,12 +209,17 @@ Run from the repo root in PowerShell. The raw dataset is not in git and lives in
    ```
    Check: it reports 61 events matched, 29 human-presence events, 22 of 29 with a YAMNet detection, and 168 YAMNet-positive clips.
 
-6. Run the unit tests, then all six response-window variants (variant 1 must reproduce the reference, or the run stops):
+6. Run the unit tests, then all seven response-window variants (variant 1 must reproduce the reference, or the run stops):
    ```
    .venv\Scripts\python tests\test_exclusion.py
    .venv\Scripts\python src\run_variants.py --dataset ..\bioacoustics_dataset.csv
    ```
    Output: `results\tables\variant_results.csv`, `variant_recorder_results.csv`, `variant_effort_summary.csv`.
+   Then write the event-count table (events used per variant and group):
+   ```
+   .venv\Scripts\python src\event_counts.py
+   ```
+   Output: `results\tables\event_counts.csv`. In it, `usable` means the event has a contrast, and `no_baseline` means it has none.
 
 7. Run the placebo-in-time calibration for every variant (strict pool and secondary relaxed pool; needs step 6 first):
    ```

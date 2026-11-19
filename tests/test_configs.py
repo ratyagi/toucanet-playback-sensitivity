@@ -41,6 +41,17 @@ def test_every_variant_tests_a_drop():
         assert {h["alternative"] for h in spec["hypotheses"]} == {"less"}, path.name
 
 
+def test_variant_4c_is_2b_plus_exclusion():
+    """4c is the exact design-document analysis: 2b settings with the YAMNet exclusion of 4a and 4b."""
+    v = lambda n: json.loads((CONFIGS / "variants" / n).read_text(encoding="utf-8"))
+    b, c, a4 = v("v2b_post_playback_5min.json"), v("v4c_post_playback_5min_excluded.json"), v("v4b_post_playback_excluded.json")
+    for field in ("bin_minutes", "pre_window", "post_window", "hypotheses"):
+        assert b[field] == c[field], field
+    assert (c["bin_minutes"], c["post_window"]["start_minutes"], c["post_window"]["end_minutes_exclusive"]) == (5, 20, 60)
+    assert c["exclude_yamnet"] is True and c["yamnet_tail_seconds"] == a4["yamnet_tail_seconds"] == 300
+    assert b["exclude_yamnet"] is False
+
+
 def test_compare_runs_detects_a_change():
     with tempfile.TemporaryDirectory() as t:
         a, b = Path(t, "a"), Path(t, "b")

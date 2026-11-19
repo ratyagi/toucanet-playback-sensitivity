@@ -18,22 +18,24 @@ Is the apparent acoustic response to simulated human presence a biological chang
 Primary test: call rate, isolated events, baseline-adjusted, random-intercept model by recorder.
 Events: 29 (11 complete isolated, 11 complete overlapping, 7 incomplete). The primary model uses 10 of the 11 isolated events, because one has no usable baseline.
 
-| Variant | Window | Events | Recorders | Estimate (calls/min) | 95% CI | p (two-sided) | Min. detectable |
-|---|---|---|---|---|---|---|---|
-| 1 | 0-60 min, 15-min bins | 10 | 6 | -0.41 | -2.11 to +1.29 | 0.64 | 1.70 |
-| 2 | 15-60 min, 15-min bins | 9 | 6 | -0.48 | -2.60 to +1.64 | 0.66 | 2.12 |
-| 2b | 20-60 min, 5-min bins | 11 | 6 | -0.58 | -2.17 to +1.01 | 0.48 | 1.59 |
-| 3 | 30-60 min, 15-min bins | 8 | 6 | -0.54 | -3.18 to +2.11 | 0.69 | 2.64 |
-| 4a | 0-60 min, 15-min bins, YAMNet clips removed | 10 | 6 | -0.34 | -2.05 to +1.37 | 0.69 | 1.71 |
-| 4b | 15-60 min, 15-min bins, YAMNet clips removed | 9 | 6 | -0.47 | -2.60 to +1.67 | 0.67 | 2.14 |
+| Variant | Window | Events | Recorders | Estimate (calls/min) | 95% CI | p one-sided | p one-sided, Holm | p two-sided | Min. detectable |
+|---|---|---|---|---|---|---|---|---|---|
+| 1 | 0-60 min, 15-min bins | 10 | 6 | -0.41 | -2.11 to +1.29 | 0.32 | 0.64 | 0.64 | 1.70 |
+| 2 | 15-60 min, 15-min bins | 9 | 6 | -0.48 | -2.60 to +1.64 | 0.33 | 0.66 | 0.66 | 2.12 |
+| 2b | 20-60 min, 5-min bins | 11 | 6 | -0.58 | -2.17 to +1.01 | 0.24 | 0.48 | 0.48 | 1.59 |
+| 3 | 30-60 min, 15-min bins | 8 | 6 | -0.54 | -3.18 to +2.11 | 0.34 | 0.69 | 0.69 | 2.64 |
+| 4a | 0-60 min, 15-min bins, YAMNet clips removed | 10 | 6 | -0.34 | -2.05 to +1.37 | 0.35 | 0.69 | 0.69 | 1.71 |
+| 4b | 15-60 min, 15-min bins, YAMNet clips removed | 9 | 6 | -0.47 | -2.60 to +1.67 | 0.33 | 0.67 | 0.67 | 2.14 |
+| 4c | 20-60 min, 5-min bins, YAMNet clips removed | 11 | 6 | -0.58 | -2.17 to +1.01 | 0.24 | 0.48 | 0.48 | 1.59 |
 
-- All six estimates are negative (-0.34 to -0.58) and every interval includes zero.
+- 7 of 7 estimates are negative (-0.58 to -0.34). 7 of 7 intervals include zero. Events used per variant: `results/tables/event_counts.csv`.
+- p one-sided: the drop hypothesis, unadjusted. p one-sided, Holm: adjusted across the two outcomes (call rate, taxa count). p two-sided: unadjusted, and the one the gate uses, because the design document states changes in either direction.
 - Secondary outcome, taxa count: estimates -0.08 to +0.40 taxa, smallest p = 0.48. Full table: `results/tables/results_table.csv`.
 
 ## Exploratory checks (not part of the verdict)
 
 - **The sign depends on how missing baselines are handled.** Without baseline adjustment the variant 1 estimate is +0.68 (p = 0.28, 11 events). Using only complete windows it is +0.53 (p = 0.63, 5 events).
-- **Placebo-in-time, 5 events on 4 recorders.** Variant 1 observed +0.47, placebo 95% range -1.36 to +0.47, two-sided p = 0.054. Variant 2: p = 0.010. 5 of 6 variants have p < 0.05, all on the same events and unadjusted for multiple looks.
+- **Placebo-in-time, 5 events on 4 recorders.** Variant 1 observed +0.47, placebo 95% range -1.36 to +0.47, two-sided p = 0.054. Variant 2: p = 0.010. 6 of 7 variants have p < 0.05, all on the same events. After Holm adjustment across variants, 0 of 7.
   - The direction is an increase. The one-sided test for a drop gives p = 0.97, so it gives no support for a drop.
   - The placebo null is not centered on zero (median -0.31), so comparing with zero would be the wrong test.
 - **By recorder (variant 1).** Audio_Moth_1 to 4 average +0.66 (5 events). Audio_Moth_5 and 6 average -1.91 (5 events). These two recorders have no presence-free days, so their baselines are thin.

@@ -18,9 +18,10 @@ REPO = Path(__file__).resolve().parents[1]
 TABLES = REPO / "results" / "tables"
 ANALYSIS, HYPOTHESIS = "primary_isolated", "primary_call_rate"
 VARIANTS = ["v1_original", "v2_post_playback", "v2b_post_playback_5min", "v3_buffered",
-            "v4a_original_excluded", "v4b_post_playback_excluded"]
+            "v4a_original_excluded", "v4b_post_playback_excluded", "v4c_post_playback_5min_excluded"]
 LABEL = {"v1_original": "1", "v2_post_playback": "2", "v2b_post_playback_5min": "2b", "v3_buffered": "3",
-         "v4a_original_excluded": "4a", "v4b_post_playback_excluded": "4b"}
+         "v4a_original_excluded": "4a", "v4b_post_playback_excluded": "4b",
+         "v4c_post_playback_5min_excluded": "4c"}
 Z = 1.96
 
 
@@ -30,8 +31,10 @@ def results_table(variant_results: pd.DataFrame) -> pd.DataFrame:
     t["ci_low"] = t["estimate"] - Z * t["standard_error"]
     t["ci_high"] = t["estimate"] + Z * t["standard_error"]
     t["variant_id"] = t["variant"].map(LABEL)
+    t = t.rename(columns={"one_sided_p_less": "one_sided_p", "holm_p": "one_sided_p_holm_2_outcomes"})
     cols = ["variant_id", "variant", "hypothesis", "post_window", "bin_minutes", "yamnet_excluded", "n_events",
-            "n_recorders", "estimate", "ci_low", "ci_high", "standard_error", "two_sided_p",
+            "n_recorders", "estimate", "ci_low", "ci_high", "standard_error", "one_sided_p",
+            "one_sided_p_holm_2_outcomes", "two_sided_p",
             "minimum_detectable_effect"]
     t = t[cols]
     t["variant"] = pd.Categorical(t["variant"], VARIANTS, ordered=True)
@@ -66,8 +69,8 @@ def build_report(variant_results, decision, placebo, recorders, split, checksum:
     for r in calls.itertuples():
         window = f"{r.post_window} min, {int(r.bin_minutes)}-min bins" + (", YAMNet clips removed" if r.yamnet_excluded else "")
         main_rows.append([r.variant_id, window, str(r.n_events), str(r.n_recorders), f(r.estimate, 2, True),
-                          f"{f(r.ci_low, 2, True)} to {f(r.ci_high, 2, True)}", f(r.two_sided_p), f(r.minimum_detectable_effect)])
-    main_table = md_table(["Variant", "Window", "Events", "Recorders", "Estimate (calls/min)", "95% CI", "p (two-sided)", "Min. detectable"], main_rows)
+                          f"{f(r.ci_low, 2, True)} to {f(r.ci_high, 2, True)}", f(r.one_sided_p), f(r.one_sided_p_holm_2_outcomes), f(r.two_sided_p), f(r.minimum_detectable_effect)])
+    main_table = md_table(["Variant", "Window", "Events", "Recorders", "Estimate (calls/min)", "95% CI", "p one-sided", "p one-sided, Holm", "p two-sided", "Min. detectable"], main_rows)
 
     taxa = table[table["hypothesis"] == "secondary_taxa_count"]
     taxa_line = (f"Secondary outcome, taxa count: estimates {f(taxa['estimate'].min(), 2, True)} to {f(taxa['estimate'].max(), 2, True)} "
@@ -81,6 +84,7 @@ def build_report(variant_results, decision, placebo, recorders, split, checksum:
     pl = placebo[(placebo["pool"] == "strict") & (placebo["analysis"] == ANALYSIS) & (placebo["hypothesis"] == HYPOTHESIS)].set_index("variant")
     pv1, pv2 = pl.loc["v1_original"], pl.loc["v2_post_playback"]
     n_sig = int((pl["p_two_sided"] < 0.05).sum())
+    n_sig_holm = int((decision["placebo_p_two_sided_holm_across_variants"] < 0.05).sum())
 
     rec = recorders[(recorders["method"] == "primary") & (recorders["analysis"] == ANALYSIS)
                     & (recorders["hypothesis"] == HYPOTHESIS) & (recorders["variant"] == "v1_original")]
@@ -91,6 +95,11 @@ def build_report(variant_results, decision, placebo, recorders, split, checksum:
     drop_support = "no support" if pv1["p_less"] > 0.05 else "some support"
     all_ev = split[(split["variant"] == "v1_original") & (split["analysis"] == "all_events")].set_index("has_yamnet_detection")
 
+    n_neg = int((calls["estimate"] < 0).sum())
+    n_zero = int(((calls["ci_low"] <= 0) & (calls["ci_high"] >= 0)).sum())
+    sign_line = (f"{n_neg} of {len(calls)} estimates are negative ({f(calls['estimate'].min(), 2, True)} to "
+                 f"{f(calls['estimate'].max(), 2, True)}). {n_zero} of {len(calls)} intervals include zero. "
+                 "Events used per variant: `results/tables/event_counts.csv`.")
     gate_line = (f"Gate: variant 1 primary isolated call rate needs two-sided p < 0.05. Observed p = {f(gate['two_sided_p'])}."
                  if overall["comparison"] == "inconclusive_gate_not_passed" else overall["note"])
     return f"""# Playback Experiment: results and verdict
@@ -115,13 +124,14 @@ Events: 29 (11 complete isolated, 11 complete overlapping, 7 incomplete). The pr
 
 {main_table}
 
-- All six estimates are negative ({f(calls['estimate'].max(), 2, True)} to {f(calls['estimate'].min(), 2, True)}) and every interval includes zero.
+- {sign_line}
+- p one-sided: the drop hypothesis, unadjusted. p one-sided, Holm: adjusted across the two outcomes (call rate, taxa count). p two-sided: unadjusted, and the one the gate uses, because the design document states changes in either direction.
 - {taxa_line}
 
 ## Exploratory checks (not part of the verdict)
 
 - **The sign depends on how missing baselines are handled.** Without baseline adjustment the variant 1 estimate is {f(raw['estimate'], 2, True)} (p = {f(raw['two_sided_p'])}, {int(raw['n_events'])} events). Using only complete windows it is {f(complete['estimate'], 2, True)} (p = {f(complete['two_sided_p'])}, {int(complete['n_events'])} events).
-- **Placebo-in-time, {int(pv1['events'])} events on {int(pv1['recorders'])} recorders.** Variant 1 observed {f(pv1['observed'], 2, True)}, placebo 95% range {f(pv1['null_q025'], 2, True)} to {f(pv1['null_q975'], 2, True)}, two-sided p = {f(pv1['p_two_sided'], 3)}. Variant 2: p = {f(pv2['p_two_sided'], 3)}. {n_sig} of 6 variants have p < 0.05, all on the same events and unadjusted for multiple looks.
+- **Placebo-in-time, {int(pv1['events'])} events on {int(pv1['recorders'])} recorders.** Variant 1 observed {f(pv1['observed'], 2, True)}, placebo 95% range {f(pv1['null_q025'], 2, True)} to {f(pv1['null_q975'], 2, True)}, two-sided p = {f(pv1['p_two_sided'], 3)}. Variant 2: p = {f(pv2['p_two_sided'], 3)}. {n_sig} of {len(pl)} variants have p < 0.05, all on the same events. After Holm adjustment across variants, {n_sig_holm} of {len(pl)}.
   - The direction is an {direction}. The one-sided test for a drop gives p = {f(pv1['p_less'], 2)}, so it gives {drop_support} for a drop.
   - The placebo null is not centered on zero (median {f(pv1['null_median'], 2, True)}), so comparing with zero would be the wrong test.
 - **By recorder (variant 1).** Audio_Moth_1 to 4 average {f(weighted_mean(near), 2, True)} ({int(near['events'].sum())} events). Audio_Moth_5 and 6 average {f(weighted_mean(far), 2, True)} ({int(far['events'].sum())} events). These two recorders have no presence-free days, so their baselines are thin.
