@@ -4,7 +4,7 @@ Tests whether the apparent acoustic response to simulated human presence is a bi
 
 Part of Team Toucanet (Kashmir World Foundation), Fall 2026. Feeds Fall Plan next step 2 (stability vs. ecological interpretability) and the December go/no-go on the current embedding paradigm.
 
-**Status (November 19, 2026):** analysis for Weeks 1 to 7 is complete and committed. Week 8 (variant 4c, p-value labels, event counts) is done and awaiting commit. The pre-registered verdict is **inconclusive**. The lead's feedback of November 12 is built into the plan below (Weeks 7 to 12). The result is not yet ready to support a biological-versus-direct-sound conclusion.
+**Status (November 19, 2026):** analysis for Weeks 1 to 8 is complete and committed. Week 9 (robustness checks and result figures) is done and awaiting commit. The pre-registered verdict is **inconclusive**. The lead's feedback of November 12 is built into the plan below (Weeks 7 to 12). The result is not yet ready to support a biological-versus-direct-sound conclusion.
 
 ## Why this matters
 
@@ -19,9 +19,9 @@ Do estimated changes in animal acoustic activity persist after the labeled event
 
 ## What the simulation events are
 
-Source: the field team, as relayed by Daan, November 2026. The lead has not yet confirmed this wording.
+Source: the field team, relayed by Daan, and confirmed in the lead's written answer of November 19, 2026.
 
-- Events were logged in the DeepData Capture app with a single timestamp, linked to one 3-second clip. `Sim Relative Time` was added during data processing. Time zero is the moment the simulation event took place. Negative time is before it, positive time is after it.
+- Events were logged in the DeepData Capture app with a single timestamp, linked to one 3-second clip. `Sim Relative Time` was not collected in the field. Griffin's team added it during data processing, so that clips around an event can be placed before or after it. Time zero is the moment the simulation event took place. Negative time is before it, positive time is after it.
 - **Human presence (on trail and off trail):** real people were present. No sound was played. Effects on vocalizations are assumed from 600 seconds before to 600 seconds after time zero.
 - **Anthropogenic sound events:** a sound was played at time zero. Effects are assumed up to 300 seconds after.
 - Consequence for this repository: "playback" in the design document applies to the sound events. For the 29 human-presence events, the direct-sound question is whether the recorder hears the people themselves. Prose now says "after time zero" instead of "post-playback". Variant and config file names keep their original names so results stay traceable.
@@ -119,7 +119,7 @@ Fixed in `PREREGISTRATION.md`. The design document gives no numeric thresholds, 
 ### Week 7: Feedback intake and inputs
 - [x] Add the lead's `hypotheses.json` to `configs/` unmodified. Rerun the placebo script with it and compare with the draft run (`src/compare_runs.py`). Result: all 10 outputs identical. Logged in `DEVIATIONS.md`.
 - [x] Remove DRAFT labels from the decision table and the report. Hypotheses are labeled as the lead's file.
-- [x] Record the field team's description of `Sim Relative Time` in `DEVIATIONS.md`, with the lead's confirmation marked pending. `PREREGISTRATION.md` stays unedited and is read through the terminology entry. Prose uses "after time zero" and "labeled interval".
+- [x] Record the field team's description of `Sim Relative Time` in `DEVIATIONS.md`, with the lead's confirmation marked pending. Confirmed on November 19 (see `DEVIATIONS.md`). `PREREGISTRATION.md` stays unedited and is read through the terminology entry. Prose uses "after time zero" and "labeled interval".
 - [x] Provenance for the lead's scripts (`src/lead/PROVENANCE.md`) and the reference files (`reference/PROVENANCE.md`), checked by `tests/test_provenance.py`.
 - [x] Group names "11 complete isolated, 11 complete overlapping, 7 incomplete" in the README and the report. The primary model uses 10 of the 11 isolated events.
 - [ ] Carried to Week 11: the progress deck still uses the old wording and the draft label.
@@ -135,11 +135,13 @@ Fixed in `PREREGISTRATION.md`. The design document gives no numeric thresholds, 
 
 ### Week 9: Exploratory robustness checks
 All three are exploratory and cannot change the verdict. Specifications are fixed in `DEVIATIONS.md` (Week 4 and Week 6 addenda).
-- [ ] **Negative binomial count model:** recorded-minutes offset, recorder fixed effects, time-of-day harmonics, standard errors clustered by recorder and date. Windows 0-60 and 15-60. Test the code on simulated data first. Report non-convergence as not estimable.
-- [ ] **Leave-own-day-out baseline:** report how many events keep a usable contrast.
-- [ ] **Leave-one-recorder-out:** refit variants 1 and 2 six times. Flag a recorder as influential if dropping it flips the sign or crosses p = 0.05.
-- [ ] State in the report that clustered standard errors may be unstable with 6 recorders and 5 dates.
-- **Done when:** three result tables are committed in `results/tables/`, each with a convergence or estimability flag, and the tests pass.
+- [x] **Negative binomial count model:** recorded-minutes offset, recorder fixed effects, time-of-day harmonics, standard errors clustered by recorder and date. Windows 0-60 and 15-60. Test the code on simulated data first. Report non-convergence as not estimable.
+- [x] **Leave-own-day-out baseline:** report how many events keep a usable contrast.
+- [x] **Leave-one-recorder-out:** refit variants 1 and 2 six times. Flag a recorder as influential if dropping it flips the sign or crosses p = 0.05.
+- [x] State in the report that clustered standard errors may be unstable with 6 recorders and 5 dates. The count-model p is 0.03 or 0.16 depending on the clustering.
+- [x] Result figures from the tables: `src/make_figures.py` writes `fig_variants`, `fig_placebo`, `fig_leave_one_recorder_out` and `fig_count_model` in `results/figures/`.
+- [x] One readout added after the first count-model result (post over pre rate ratio), logged in `DEVIATIONS.md` and labeled as such in the report.
+- **Done when:** three result tables are committed in `results/tables/`, each with a convergence or estimability flag, and the tests pass. Met once committed.
 
 ### Week 10: Listening review
 - [ ] Document the exclusions (2,400 overlapped clips, 63 of 167 positive clips, off-trail events) and the sampling weights in `results/listening/PROTOCOL.md` and the report.
@@ -155,13 +157,13 @@ All three are exploratory and cannot change the verdict. Specifications are fixe
 - [ ] Regenerate `REPORT.md` with variant 4c, the p-value types, the exploratory checks, and the listening results.
 - [ ] Add the recommendation section: go, no-go, or hold, mapped from the verdict. State that the mapping was written after the verdict was known, and that it covers this experiment only, not the December decision.
 - [ ] Keep the statement that the result is not yet ready to support a biological-versus-direct-sound conclusion.
-- [ ] Update the limitations list: clustered standard errors, the `Sim Relative Time` answer, the off-trail window, and the thin baselines at Audio_Moth_5 and 6.
+- [ ] Update the limitations list: clustered standard errors, the confirmed `Sim Relative Time` description (one 3-second clip per event timestamp), the off-trail window, and the thin baselines at Audio_Moth_5 and 6.
 - [ ] Rebuild the deck (`docs/`).
 - [ ] Reproducibility check: clone the repository into a clean folder, create the environment, run steps 1 to 11, and compare every table with the committed one.
 - **Done when:** the clean-clone run reproduces all tables, and the report has been read through once for accuracy.
 
 ### Week 12: Handover
-- [ ] Send the final report and deck to the lead. Answer his follow-up on `Sim Relative Time` when it arrives, and update the documents if it differs from the relayed answer.
+- [ ] Send the final report and deck to the lead. His answer on `Sim Relative Time` arrived on November 19 and matches the relayed description, so only the wording of the status lines changed.
 - [ ] Tag the repository (for example `v1.0-report`) and push.
 - [ ] Hand the verdict to the team for the December LODO comparison. Ask the lead who collects it, since the Fall Plan names no owner.
 - [ ] List follow-up needs: more recording days at the Audio_Moth_5 and 6 sites and days without simulated events, so baselines exist.
@@ -169,13 +171,25 @@ All three are exploratory and cannot change the verdict. Specifications are fixe
 
 ## Open issues
 
-- **`Sim Relative Time`:** the lead is confirming with the people who set up the experiment. Until then, later windows are described as "after time zero".
-- **Off-trail events:** the dataset labels the 2 off-trail events only from 0 to +5 minutes, but the field team's description assumes the same 600 seconds before and after as on-trail events. Ask which is intended.
-- **Thin baselines:** Audio_Moth_5 and 6 hold 16 of 29 events and have no presence-free days. The reference baseline also includes the event's own day. The leave-own-day-out check (Week 9) tests this.
-- **Placebo exclusion:** the position-matched drop was implemented and logged. Ask the team to confirm it.
-- **Fit stability:** 31 of 72 model fits used the optimizer fallback and one had no valid standard error. This is the lead's fitting code, unchanged.
-- **Listening review:** needs the audio files.
-- **December LODO:** the Fall Plan names no owner for collecting this experiment's result.
+Updated November 19, 2026.
+
+**Resolved**
+- **`Sim Relative Time`:** the lead confirmed the description (November 19). Time zero is the moment the event took place. Windows stay worded as "after time zero", because no sound was played for human presence.
+- **Second listening reviewer:** not needed. The experiment owner reviews alone, agreed with the lead (November 19). The report states that the review is not independent.
+- **Exact 20-60 minute YAMNet-excluded analysis:** added as variant 4c (Week 8). The verdict did not change.
+
+**Needs the lead's answer**
+- **Off-trail events:** the lead confirms the assumed effect interval is 600 seconds before to 600 seconds after, on trail and off trail alike. The dataset still labels the 2 off-trail events only from 0 to +5 minutes. No result depends on the label (contamination uses 10 minutes either side for every presence event). The 2 events are not in the listening pool, which is already drawn with a fixed seed. Question: add them?
+- **Placebo exclusion:** the position-matched drop was implemented and logged. Question: is it the intended choice?
+- **December LODO table:** the Fall Plan names no owner for collecting this experiment's result. Question: who collects it?
+- **Fit stability:** 31 of 72 model fits used the optimizer fallback and one had no valid standard error. This is the lead's fitting code, unchanged. Question: any preferred handling?
+
+**Open in this repository**
+- **Count model standard errors (Week 9):** clustering by recorder and date at once gives no valid standard error with 6 recorders and 5 dates, found on simulated data. The main standard error clusters by recorder-day, and the two-way version is reported next to it. Logged in `DEVIATIONS.md`. Results are not yet run.
+- **Thin baselines (Week 9):** Audio_Moth_5 and 6 hold 16 of 29 events and have no presence-free days. The reference baseline also includes the event's own day. The leave-own-day-out check tests this.
+- **Listening review (Week 10):** the audio files are not yet in hand. The review is single-rater, so it is not independent.
+- **Progress deck (Week 11):** it still uses the old wording and the draft label.
+- **Conclusion:** the verdict is inconclusive, so the result does not yet support a biological-versus-direct-sound conclusion.
 
 ## How to reproduce
 
@@ -249,7 +263,21 @@ Run from the repo root in PowerShell. The raw dataset is not in git and lives in
    ```
    Output: `results\listening\review_sheet.csv` (for the reviewer) and `sample_key.csv` (labels and positions; keep it away from the reviewer). With the audio folder at hand, `src\prepare_listening_audio.py --audio-dir <wav folder> --output-dir <reviewer folder>` copies the clips under neutral names (L001.wav ...). After the review, `src\analyze_listening.py --sheet <completed sheet>` writes `results\tables\listening_summary.csv`.
 
-11. Build the results table and the report (reads existing tables only; needs steps 8 and 9 first):
+11. Week 9 robustness checks (exploratory, not part of the verdict; needs step 6 first):
+   ```
+   .venv\Scripts\python tests\test_robustness.py
+   .venv\Scripts\python src\robustness.py --dataset ..\bioacoustics_dataset.csv
+   ```
+   Output: `results\tables\robustness_count_model.csv`, `robustness_leave_own_day.csv`, `robustness_leave_one_recorder.csv`.
+
+12. Result figures (reads existing tables only; needs steps 6, 7 and 11 first):
+   ```
+   .venv\Scripts\python tests\test_figures.py
+   .venv\Scripts\python src\make_figures.py
+   ```
+   Output: `results\figures\fig_variants.png`, `fig_placebo.png`, `fig_leave_one_recorder_out.png`, `fig_count_model.png`.
+
+13. Build the results table and the report (reads existing tables only; needs steps 8, 9, 11 and 12 first):
    ```
    .venv\Scripts\python tests\test_report.py
    .venv\Scripts\python src\make_report.py
@@ -280,7 +308,7 @@ toucanet-playback-sensitivity/
   reference/        # lead's reference outputs, dataset checksum, event spans
   results/
     tables/         # all result tables
-    figures/        # per-recorder event diagnostics
+    figures/        # event diagnostics per recorder, result figures (fig_*.png)
     listening/      # review protocol, blind sheet, sample key
     intermediate/   # regenerated, gitignored
   src/

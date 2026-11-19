@@ -15,6 +15,7 @@ def build():
     return mr.build_report(pd.read_csv(T / "variant_results.csv"), pd.read_csv(T / "decision_summary.csv"),
                            pd.read_csv(T / "placebo_results.csv"), pd.read_csv(T / "variant_recorder_results.csv"),
                            pd.read_csv(T / "yamnet_split_summary.csv"),
+                           tuple(pd.read_csv(T / f"robustness_{n}.csv") for n in ("count_model", "leave_own_day", "leave_one_recorder")),
                            (REPO / "reference" / "dataset_checksum.txt").read_text().split()[0])
 
 

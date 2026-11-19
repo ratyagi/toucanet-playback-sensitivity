@@ -178,3 +178,51 @@ Written and committed before variant 4c was run. Responds to the lead's feedback
 - Rerun check: the other six variants give identical rows in `variant_results.csv` and `placebo_results.csv` to the committed tables (largest difference 0.0).
 - The verdict is unchanged: inconclusive, gate p = 0.637.
 - Placebo-in-time for 4c: 5 events, observed +0.40, two-sided p = 0.040 unadjusted. After Holm across the 7 variants, no variant is below 0.05 (smallest 0.070). Exploratory.
+
+## 2026-11-19: Week 9 clarification before running: clustering of the count model
+
+- The Week 4 addendum says standard errors are "clustered by recorder and date". It does not say whether this means two-way clustering or recorder-by-date clusters.
+- Found on simulated data, before any real fit: two-way clustering gives no valid standard error (negative covariance) with 6 recorders and 5 dates, even when the simulated data have no clustering at all.
+- Fixed before the real run:
+  - Primary standard error: clustered by recorder-day (each recorder on each date is one cluster, 30 clusters).
+  - The literal two-way version is also reported next to it. If its covariance is not positive, it is reported as not estimable.
+- Everything else in the Week 4 addendum is unchanged: NB2, log link, recorded-minutes offset, recorder fixed effects, 24 h and 12 h harmonics, pre and post indicators, windows 0 to 60 and 15 to 60.
+- Implementation choices, also fixed before the real run:
+  - The same 10 events (primary isolated, usable variant 1 contrast) are used for both windows.
+  - For the 15 to 60 window, the bin from 0 to 15 minutes is in neither window and is left out.
+  - A bin in an event window keeps its window role and is not also used as a baseline bin.
+- Variant results seen when written: yes for variants 1 to 4c. The count model and the two baseline checks have not been run on the real data.
+
+## 2026-11-19: Lead's confirmation of `Sim Relative Time`
+
+- Source: the lead's written answer, received November 19, 2026.
+- Content: relative time was not collected in the field. Griffin's team added it during data processing. Events were logged in the DeepData Capture app with a single timestamp, so each links to one 3-second clip. Time zero is the moment the simulation event took place. For human presence, on trail and off trail, effects are assumed from 600 s before to 600 s after. For introduced anthropogenic sound, effects are assumed up to 300 s after.
+- This matches the description in the November 19 terminology entry. The "lead has not yet confirmed" statements are now out of date. No analysis changes.
+- Wording kept: windows are "after time zero", not "post-playback", because no sound was played for human presence.
+- Off-trail events: the assumed interval is now confirmed as 600 s either side, the same as on trail. The dataset still labels the 2 off-trail events only from 0 to +5 minutes. The analysis uses the same 10-minute contamination buffer for every presence event, so no result depends on the labeled span. The 2 events stay out of the listening pool, which is already drawn. Open for the lead: whether to add them.
+- Consequence for precision: event timing is known to about one 3-second clip.
+
+## 2026-11-19: Week 9 first run and one readout added after seeing it
+
+First real run of `src/robustness.py` (exploratory, none of it can change the verdict):
+
+- **Count model, post window against clean baseline bins (as specified):**
+  - Window 0 to 60: rate ratio 0.64 (95% interval 0.42 to 0.96), p = 0.032 with recorder-day clusters, p = 0.162 with the literal two-way clustering.
+  - Window 15 to 60: rate ratio 0.67 (0.44 to 1.01), p = 0.057 recorder-day, p = 0.186 two-way.
+  - 28 recorder-day clusters. The two clusterings disagree about significance, so the result depends on a clustering choice that 6 recorders and 5 dates cannot settle.
+  - Unlike on simulated data, the two-way covariance was valid on the real data. The Week 9 clarification chose recorder-day as the main standard error before this was known. Both are reported.
+- **Leave-own-day-out baseline:**
+  - Variant 1: -0.50 (p = 0.61) against -0.41 (p = 0.64) with the reference baseline.
+  - Variant 2: -0.64 (p = 0.60) against -0.48 (p = 0.66).
+  - Leaving the event's own day out makes the estimates a little larger. The gate still fails.
+- **Leave-one-recorder-out:**
+  - Omitting Audio_Moth_6 (8 events) flips the sign in both variants (variant 1: +0.01, variant 2: +0.10). It is the only recorder flagged influential.
+  - Omitting Audio_Moth_3 moves both estimates to about zero (-0.04, -0.08) without flipping the sign.
+  - No omission brings the two-sided p below 0.05 (smallest 0.13).
+
+**Added after seeing the count-model result (not in the Week 4 addendum):**
+- The specified effect compares the post window with clean baseline bins. The pre window can also differ from the baseline, and the primary test compares post with pre.
+- `fit_count_model` now also reports the pre-window rate ratio and the post over pre rate ratio, with both clusterings. This is the count-model counterpart of the primary contrast.
+- Result: pre against baseline is already 0.82, and post over pre is 0.77 (p = 0.50 recorder-day, 0.58 two-way) for window 0 to 60, and 0.81 (p = 0.59, 0.65) for window 15 to 60.
+- Reading: the lower post rate against baseline is mostly a lower rate over the whole event period, not a drop after time zero. Against the pre window there is no detectable change, which agrees with the linear model.
+- This readout was chosen after the first result, so it is labeled as such in the report. The specified post-against-baseline effect stays reported.

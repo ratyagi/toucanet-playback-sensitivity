@@ -1,0 +1,5 @@
+variant,baseline,n_events,n_recorders,estimate,standard_error,two_sided_p,converged,fit_method
+v1_original,leave_own_day_out,10,6,-0.501874500049069,0.9775046819554979,0.6076546634527162,True,mixedlm
+v1_original,reference_baseline,10,6,-0.40954684481016945,0.8666159601970929,0.6365116400709631,True,mixedlm
+v2_post_playback,leave_own_day_out,9,6,-0.6396790190135766,1.233713264869628,0.6041102000757858,True,mixedlm
+v2_post_playback,reference_baseline,9,6,-0.47916134319790954,1.083515372609004,0.6583238877505806,True,mixedlm

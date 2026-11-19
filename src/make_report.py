@@ -57,7 +57,8 @@ def weighted_mean(df: pd.DataFrame) -> float:
     return float((df["events"] * df["mean_contrast"]).sum() / df["events"].sum())
 
 
-def build_report(variant_results, decision, placebo, recorders, split, checksum: str) -> str:
+def build_report(variant_results, decision, placebo, recorders, split, robustness, checksum: str) -> str:
+    count, own_day, loro = robustness
     table = results_table(variant_results)
     calls = table[table["hypothesis"] == HYPOTHESIS]
     overall = decision.loc[decision["variant"] == "OVERALL"].iloc[0]
@@ -100,6 +101,12 @@ def build_report(variant_results, decision, placebo, recorders, split, checksum:
     sign_line = (f"{n_neg} of {len(calls)} estimates are negative ({f(calls['estimate'].min(), 2, True)} to "
                  f"{f(calls['estimate'].max(), 2, True)}). {n_zero} of {len(calls)} intervals include zero. "
                  "Events used per variant: `results/tables/event_counts.csv`.")
+    c1 = count[count["variant"] == "v1_original"].iloc[0]
+    d1 = own_day[own_day["variant"] == "v1_original"].set_index("baseline")
+    d2 = own_day[own_day["variant"] == "v2_post_playback"].set_index("baseline")
+    omitted = loro[loro["omitted"] != "none"]
+    flagged = sorted(set(omitted.loc[omitted["influential"], "omitted"]))
+    flagged_text = " and ".join(flagged) if flagged else "no recorder"
     gate_line = (f"Gate: variant 1 primary isolated call rate needs two-sided p < 0.05. Observed p = {f(gate['two_sided_p'])}."
                  if overall["comparison"] == "inconclusive_gate_not_passed" else overall["note"])
     return f"""# Playback Experiment: results and verdict
@@ -124,6 +131,8 @@ Events: 29 (11 complete isolated, 11 complete overlapping, 7 incomplete). The pr
 
 {main_table}
 
+![Primary estimate by variant](results/figures/fig_variants.png)
+
 - {sign_line}
 - p one-sided: the drop hypothesis, unadjusted. p one-sided, Holm: adjusted across the two outcomes (call rate, taxa count). p two-sided: unadjusted, and the one the gate uses, because the design document states changes in either direction.
 - {taxa_line}
@@ -134,9 +143,14 @@ Events: 29 (11 complete isolated, 11 complete overlapping, 7 incomplete). The pr
 - **Placebo-in-time, {int(pv1['events'])} events on {int(pv1['recorders'])} recorders.** Variant 1 observed {f(pv1['observed'], 2, True)}, placebo 95% range {f(pv1['null_q025'], 2, True)} to {f(pv1['null_q975'], 2, True)}, two-sided p = {f(pv1['p_two_sided'], 3)}. Variant 2: p = {f(pv2['p_two_sided'], 3)}. {n_sig} of {len(pl)} variants have p < 0.05, all on the same events. After Holm adjustment across variants, {n_sig_holm} of {len(pl)}.
   - The direction is an {direction}. The one-sided test for a drop gives p = {f(pv1['p_less'], 2)}, so it gives {drop_support} for a drop.
   - The placebo null is not centered on zero (median {f(pv1['null_median'], 2, True)}), so comparing with zero would be the wrong test.
+- **Count model (negative binomial, window 0 to 60).** Post window against clean baseline bins: rate ratio {f(c1['rate_ratio'])} ({f(c1['ci_low'])} to {f(c1['ci_high'])}), p = {f(c1['two_sided_p'], 3)} with recorder-day clusters, p = {f(c1['two_sided_p_two_way'], 3)} with recorder and date clustered two ways. The pre window is already {f(c1['pre_rate_ratio'])} of baseline. Post against pre, the primary design: {f(c1['post_over_pre_rate_ratio'])} (p = {f(c1['post_over_pre_p'])}). The post-against-pre readout was added after the first result.
+- **Leave-own-day-out baseline.** Variant 1 {f(d1.loc['leave_own_day_out', 'estimate'], 2, True)} (p = {f(d1.loc['leave_own_day_out', 'two_sided_p'])}) against {f(d1.loc['reference_baseline', 'estimate'], 2, True)} with the reference baseline. Variant 2 {f(d2.loc['leave_own_day_out', 'estimate'], 2, True)} against {f(d2.loc['reference_baseline', 'estimate'], 2, True)}. The gate still fails.
+- **Leave-one-recorder-out.** Omitting {flagged_text} flips the sign of the estimate (flagged in {int(omitted['influential'].sum())} of {len(omitted)} refits). No omission brings p below 0.05 (smallest {f(omitted['two_sided_p'].min())}).
 - **By recorder (variant 1).** Audio_Moth_1 to 4 average {f(weighted_mean(near), 2, True)} ({int(near['events'].sum())} events). Audio_Moth_5 and 6 average {f(weighted_mean(far), 2, True)} ({int(far['events'].sum())} events). These two recorders have no presence-free days, so their baselines are thin.
 - **YAMNet detection split (descriptive).** Mean contrast {f(all_ev.loc[True, 'mean_contrast'], 2, True)} for the {int(all_ev.loc[True, 'events'])} events with a detection and {f(all_ev.loc[False, 'mean_contrast'], 2, True)} for the {int(all_ev.loc[False, 'events'])} without. The split is confounded with recorder.
 - **Listening review:** pending.
+
+Figures: `results/figures/fig_placebo.png`, `fig_leave_one_recorder_out.png`, `fig_count_model.png`.
 
 ## Limitations
 
@@ -144,9 +158,9 @@ Events: 29 (11 complete isolated, 11 complete overlapping, 7 incomplete). The pr
 - Audio_Moth_5 and 6 hold 16 of 29 events and have no strict placebo controls.
 - 7 of 29 events have an incomplete -3 h to +12 h path.
 - YAMNet non-detection does not prove the event was inaudible.
-- The secondary count model in the plan was not fitted. The linear models above stand in for it.
+- Clustered standard errors are unstable with 6 recorders and 5 dates: the count-model p-value is {f(c1['two_sided_p'], 2)} or {f(c1['two_sided_p_two_way'], 2)} depending on how the clusters are drawn.
 - 31 of 72 model fits used the optimizer fallback, and one had no valid standard error.
-- Time zero is the moment the event was logged in the field app (field team description, relayed November 2026). The lead's confirmation is pending. Windows are described as minutes after time zero, not as after playback.
+- Time zero is the moment the simulation event took place (confirmed by the lead, November 19, 2026). Each event is tied to one 3-second clip, so its timing is accurate to about one clip. Windows are described as minutes after time zero, not as after playback, because no sound was played for human presence.
 
 ## For the December decision
 
@@ -155,7 +169,7 @@ Events: 29 (11 complete isolated, 11 complete overlapping, 7 incomplete). The pr
 
 ## Reproducibility
 
-- Steps 1 to 11 in `README.md` regenerate every table and figure. Seeds are fixed.
+- Steps 1 to 13 in `README.md` regenerate every table and figure. Seeds are fixed.
 - Choices were fixed in `PREREGISTRATION.md` before the analysis. Every later change is in `DEVIATIONS.md`.
 """
 
@@ -167,6 +181,7 @@ def main() -> None:
     text = build_report(
         variant_results, pd.read_csv(TABLES / "decision_summary.csv"), pd.read_csv(TABLES / "placebo_results.csv"),
         pd.read_csv(TABLES / "variant_recorder_results.csv"), pd.read_csv(TABLES / "yamnet_split_summary.csv"),
+        tuple(pd.read_csv(TABLES / f"robustness_{n}.csv") for n in ("count_model", "leave_own_day", "leave_one_recorder")),
         (REPO / "reference" / "dataset_checksum.txt").read_text().split()[0],
     )
     (REPO / "REPORT.md").write_text(text, encoding="utf-8", newline="\n")

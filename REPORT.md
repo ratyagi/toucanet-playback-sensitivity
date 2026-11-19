@@ -28,6 +28,8 @@ Events: 29 (11 complete isolated, 11 complete overlapping, 7 incomplete). The pr
 | 4b | 15-60 min, 15-min bins, YAMNet clips removed | 9 | 6 | -0.47 | -2.60 to +1.67 | 0.33 | 0.67 | 0.67 | 2.14 |
 | 4c | 20-60 min, 5-min bins, YAMNet clips removed | 11 | 6 | -0.58 | -2.17 to +1.01 | 0.24 | 0.48 | 0.48 | 1.59 |
 
+![Primary estimate by variant](results/figures/fig_variants.png)
+
 - 7 of 7 estimates are negative (-0.58 to -0.34). 7 of 7 intervals include zero. Events used per variant: `results/tables/event_counts.csv`.
 - p one-sided: the drop hypothesis, unadjusted. p one-sided, Holm: adjusted across the two outcomes (call rate, taxa count). p two-sided: unadjusted, and the one the gate uses, because the design document states changes in either direction.
 - Secondary outcome, taxa count: estimates -0.08 to +0.40 taxa, smallest p = 0.48. Full table: `results/tables/results_table.csv`.
@@ -38,9 +40,14 @@ Events: 29 (11 complete isolated, 11 complete overlapping, 7 incomplete). The pr
 - **Placebo-in-time, 5 events on 4 recorders.** Variant 1 observed +0.47, placebo 95% range -1.36 to +0.47, two-sided p = 0.054. Variant 2: p = 0.010. 6 of 7 variants have p < 0.05, all on the same events. After Holm adjustment across variants, 0 of 7.
   - The direction is an increase. The one-sided test for a drop gives p = 0.97, so it gives no support for a drop.
   - The placebo null is not centered on zero (median -0.31), so comparing with zero would be the wrong test.
+- **Count model (negative binomial, window 0 to 60).** Post window against clean baseline bins: rate ratio 0.64 (0.42 to 0.96), p = 0.032 with recorder-day clusters, p = 0.162 with recorder and date clustered two ways. The pre window is already 0.82 of baseline. Post against pre, the primary design: 0.77 (p = 0.50). The post-against-pre readout was added after the first result.
+- **Leave-own-day-out baseline.** Variant 1 -0.50 (p = 0.61) against -0.41 with the reference baseline. Variant 2 -0.64 against -0.48. The gate still fails.
+- **Leave-one-recorder-out.** Omitting Audio_Moth_6 flips the sign of the estimate (flagged in 2 of 12 refits). No omission brings p below 0.05 (smallest 0.13).
 - **By recorder (variant 1).** Audio_Moth_1 to 4 average +0.66 (5 events). Audio_Moth_5 and 6 average -1.91 (5 events). These two recorders have no presence-free days, so their baselines are thin.
 - **YAMNet detection split (descriptive).** Mean contrast -0.36 for the 22 events with a detection and -0.32 for the 7 without. The split is confounded with recorder.
 - **Listening review:** pending.
+
+Figures: `results/figures/fig_placebo.png`, `fig_leave_one_recorder_out.png`, `fig_count_model.png`.
 
 ## Limitations
 
@@ -48,9 +55,9 @@ Events: 29 (11 complete isolated, 11 complete overlapping, 7 incomplete). The pr
 - Audio_Moth_5 and 6 hold 16 of 29 events and have no strict placebo controls.
 - 7 of 29 events have an incomplete -3 h to +12 h path.
 - YAMNet non-detection does not prove the event was inaudible.
-- The secondary count model in the plan was not fitted. The linear models above stand in for it.
+- Clustered standard errors are unstable with 6 recorders and 5 dates: the count-model p-value is 0.03 or 0.16 depending on how the clusters are drawn.
 - 31 of 72 model fits used the optimizer fallback, and one had no valid standard error.
-- Time zero is the moment the event was logged in the field app (field team description, relayed November 2026). The lead's confirmation is pending. Windows are described as minutes after time zero, not as after playback.
+- Time zero is the moment the simulation event took place (confirmed by the lead, November 19, 2026). Each event is tied to one 3-second clip, so its timing is accurate to about one clip. Windows are described as minutes after time zero, not as after playback, because no sound was played for human presence.
 
 ## For the December decision
 
