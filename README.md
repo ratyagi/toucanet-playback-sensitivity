@@ -146,7 +146,7 @@ All three are exploratory and cannot change the verdict. Specifications are fixe
 ### Week 10: Listening review
 - [ ] Document the exclusions (2,400 overlapped clips, 63 of 167 positive clips, off-trail events) and the sampling weights in `results/listening/PROTOCOL.md` and the report.
 - [ ] Describe the positive sample as nearly a census: 100 of 104 eligible clips, 75 of 104 from Audio_Moth_6, none from Audio_Moth_3.
-- [ ] Get the audio files. Run `src/prepare_listening_audio.py`. Fix any missing clips before listening.
+- [ ] Get the audio files: run `notebooks/fetch_listening_clips.ipynb` in Google Colab. It finds the 200 clips in the shared Drive folder, saves them as `L001.wav` to `L200.wav` in a new Drive folder, checks each is 3 seconds long, and writes a tar. It must report 200 of 200 found. `src/prepare_listening_audio.py` does the same from a local folder. The notebook is generated from `sample_key.csv` by `src/make_colab_fetch_notebook.py`.
 - [ ] Adjust the rubric wording for presence events: audible sound made by people who were present.
 - [ ] Review all 200 clips blind to the label and the position. Do not edit answers after the summary is seen.
 - [ ] Single reviewer, no second rater: the experiment owner reviews all 200 clips. This was agreed with the lead on November 19. State in the report that the review is not independent.
