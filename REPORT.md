@@ -1,11 +1,11 @@
 # Playback Experiment: results and verdict
 
-Status: DRAFT. Hypotheses file reconstructed (`configs/hypotheses_draft.json`), lead's `hypotheses.json` not received. Listening review pending.
+Status: working draft. Hypotheses: the lead's `configs/hypotheses.json`. Listening review pending.
 Dataset SHA-256: `54a74d263b668adc2253eda261c1b1f532086d2671c94d3ccd467bb36e3a5aeb`. All numbers come from `results/tables/` via `src/make_report.py`.
 
 ## Question
 
-Is the apparent acoustic response to simulated human presence a biological change in animal vocal activity, or direct playback sound?
+Is the apparent acoustic response to simulated human presence a biological change in animal vocal activity, or the direct sound of the event itself (for human presence, the people the recorder hears)?
 
 ## Verdict: Inconclusive
 
@@ -16,6 +16,7 @@ Is the apparent acoustic response to simulated human presence a biological chang
 ## Results
 
 Primary test: call rate, isolated events, baseline-adjusted, random-intercept model by recorder.
+Events: 29 (11 complete isolated, 11 complete overlapping, 7 incomplete). The primary model uses 10 of the 11 isolated events, because one has no usable baseline.
 
 | Variant | Window | Events | Recorders | Estimate (calls/min) | 95% CI | p (two-sided) | Min. detectable |
 |---|---|---|---|---|---|---|---|
@@ -44,15 +45,15 @@ Primary test: call rate, isolated events, baseline-adjusted, random-intercept mo
 - Only 5 days of recording, so time-of-day baselines rest on few days.
 - Audio_Moth_5 and 6 hold 16 of 29 events and have no strict placebo controls.
 - 7 of 29 events have an incomplete -3 h to +12 h path.
-- YAMNet non-detection does not prove playback was inaudible.
+- YAMNet non-detection does not prove the event was inaudible.
 - The secondary count model in the plan was not fitted. The linear models above stand in for it.
 - 31 of 72 model fits used the optimizer fallback, and one had no valid standard error.
-- Whether `Sim Relative Time` 0 is the start or the middle of playback is unconfirmed.
+- Time zero is the moment the event was logged in the field app (field team description, relayed November 2026). The lead's confirmation is pending. Windows are described as minutes after time zero, not as after playback.
 
 ## For the December decision
 
-- Result to carry forward: inconclusive. The pre-registered test shows no detectable response, so neither a biological response nor direct playback sound can be attributed.
-- To resolve it: more events with clean baselines (recordings on days without playback at the Audio_Moth_5 and 6 sites), the lead's hypotheses file, and the listening review.
+- Result to carry forward: inconclusive. The pre-registered test shows no detectable response, so neither a biological response nor the direct sound of the event can be attributed.
+- To resolve it: more events with clean baselines (recordings on days without simulated events at the Audio_Moth_5 and 6 sites), the lead's hypotheses file, and the listening review.
 
 ## Reproducibility
 

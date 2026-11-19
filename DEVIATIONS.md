@@ -108,3 +108,28 @@ Written and committed before either check was run. Both are exploratory sensitiv
 
 **Not adjusted**
 - No multiplicity correction across variants. The gate is a single test, so the verdict is unaffected.
+
+## 2026-11-19: Lead's hypotheses.json adopted
+
+- The lead's `hypotheses.json` (received November 12, 2026) was added unmodified as `configs/hypotheses.json`. Its SHA-256 is in `reference/PROVENANCE.md`.
+- It differs from our reconstructed draft only by added metadata (`version`, `contrast`, and a description for each hypothesis). Bin size, both windows, both outcomes, and the one-sided direction are identical (`tests/test_configs.py`).
+- Check: the lead's placebo script was rerun on his file and compared with the run on our draft, using `src/compare_runs.py`. All 10 CSV and Markdown outputs are identical (run on Windows, November 19, 2026).
+- Consequence: no result changed. The DRAFT label was removed from `decision_summary.csv` and `REPORT.md`. `configs/hypotheses_draft.json` stays in the repository for the record, marked superseded in `reference/PROVENANCE.md`.
+- Variant results seen when written: yes, all of them. The check concerns only whether the input file changes any output.
+
+## 2026-11-19: Terminology after the field team's description of simulation events
+
+- Source: the field team's description relayed by Daan on November 12, 2026, and passed on by Rashi. The lead has not yet confirmed it.
+- Content: events were logged in the DeepData Capture app with a single timestamp. Time zero is the moment the simulation event took place. For human presence (on and off trail), real people were present and no sound was played, with effects assumed from 600 s before to 600 s after. For anthropogenic sound events, a sound was played at time zero, with effects assumed up to 300 s after.
+- `PREREGISTRATION.md` is not edited, because it is fixed after its commit. Read its "post-playback" and "playback interval" as "after the labeled interval" and "labeled interval (-10 to +10 minutes around time zero)".
+- The pending item in `PREREGISTRATION.md` ("reading the onset as the midpoint of that window") is superseded: for human-presence events time zero is the logged moment, and the labeled interval is the assumed exposure interval.
+- Variants 2, 2b, 3, 4b (15 to 60 and later) start after the labeled interval ends (+10 minutes). Variants 1 and 4a (0 to 60) overlap it.
+- For human-presence events, the "direct sound" hypothesis means the recorder hears the people themselves, not played sound. For anthropogenic sound events, it means the played sound.
+- Variant and config names keep "post_playback" so results stay traceable to earlier commits.
+- Open question for the lead: the dataset labels the 2 off-trail events only from 0 to +5 minutes, while the description assumes the same 600 s before and after as for on-trail events.
+- Variant results seen when written: yes.
+
+## 2026-11-19: Provenance and event-group names
+
+- `src/lead/PROVENANCE.md` and `reference/PROVENANCE.md` record the origin, SHA-256, and modification status of the lead's scripts and the reference inputs. `tests/test_provenance.py` recomputes them. This meets the lead's condition for keeping his scripts.
+- Event groups are described everywhere as 11 complete isolated, 11 complete overlapping, and 7 incomplete. The primary model uses 10 of the 11 isolated events. `PREREGISTRATION.md` uses "isolated", "overlapping", and "incomplete" with the same meaning. The progress deck in `docs/` still uses the old wording and is rebuilt in Week 11.

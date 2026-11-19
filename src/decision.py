@@ -43,7 +43,7 @@ PLACEBO_REFERENCE = "v2_post_playback"
 ALPHA = 0.05
 MIN_RATIO = 0.5
 MIN_SMALLER_FOR_CONTAMINATION = 2
-HYPOTHESES_SOURCE = "DRAFT (configs/hypotheses_draft.json, lead's hypotheses.json not received)"
+HYPOTHESES_SOURCE = "Lead's hypotheses.json (configs/hypotheses.json)"
 ANALYSIS = "primary_isolated"
 HYPOTHESIS = "primary_call_rate"
 

@@ -1,0 +1,27 @@
+{
+  "version": 1,
+  "bin_minutes": 15,
+  "contrast": "mean(post residual) - mean(pre residual)",
+  "pre_window": {
+    "start_minutes": -60,
+    "end_minutes_exclusive": 0
+  },
+  "post_window": {
+    "start_minutes": 0,
+    "end_minutes_exclusive": 60
+  },
+  "hypotheses": [
+    {
+      "name": "primary_call_rate_drop_0_60m",
+      "metric": "call_rate",
+      "alternative": "less",
+      "description": "Call rate decreases during the first 60 minutes after presence onset relative to the preceding 60 minutes."
+    },
+    {
+      "name": "secondary_taxa_count_drop_0_60m",
+      "metric": "taxa_count",
+      "alternative": "less",
+      "description": "Taxa count decreases during the first 60 minutes after presence onset relative to the preceding 60 minutes."
+    }
+  ]
+}

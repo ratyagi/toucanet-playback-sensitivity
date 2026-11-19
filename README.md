@@ -4,7 +4,7 @@ Tests whether the apparent acoustic response to simulated human presence is a bi
 
 Part of Team Toucanet (Kashmir World Foundation), Fall 2026. Feeds Fall Plan next step 2 (stability vs. ecological interpretability) and the December go/no-go on the current embedding paradigm.
 
-**Status (November 12, 2026):** analysis for Weeks 1 to 6 is complete and committed. The pre-registered verdict is **inconclusive**. The lead's feedback of November 12 is built into the plan below (Weeks 7 to 12). The result is not yet ready to support a biological-versus-direct-sound conclusion.
+**Status (November 19, 2026):** analysis for Weeks 1 to 6 is complete and committed. Week 7 inputs (the lead's hypotheses file, provenance, wording) are done. The pre-registered verdict is **inconclusive**. The lead's feedback of November 12 is built into the plan below (Weeks 7 to 12). The result is not yet ready to support a biological-versus-direct-sound conclusion.
 
 ## Why this matters
 
@@ -72,13 +72,13 @@ Fixed in `PREREGISTRATION.md`. The design document gives no numeric thresholds, 
 |---|---|
 | Run the negative binomial model, leave-own-day-out baseline, and leave-one-recorder-out as exploratory checks. Clustered standard errors may be unstable with 6 recorders and 5 dates. None can change the primary verdict. | 9 |
 | Listening review: document exclusions and sampling weights. Call the positive sample nearly a census. Have a second person review a subset independently if feasible. | 10 |
-| Keep `event_study.py` and `placebo_hypothesis_analysis.py`, with provenance and any modifications documented. | 7 |
-| Do not call later windows "post-playback" until `Sim Relative Time` is confirmed. Relayed answer received; the lead will confirm. | 7 |
+| Keep `event_study.py` and `placebo_hypothesis_analysis.py`, with provenance and any modifications documented. See `src/lead/PROVENANCE.md`. | 7 (done) |
+| Do not call later windows "post-playback" until `Sim Relative Time` is confirmed. Relayed answer recorded in `DEVIATIONS.md`; the lead will confirm. | 7 (done) |
 | Reconcile the two-sided decision rule with the one-sided hypothesis. | 8 |
 | Distinguish adjusted from unadjusted p-values. | 8 |
 | Run the exact 20-60 minute detection-excluded analysis, or document the 15-60 substitution as a deviation. Decision: run it as variant 4c. | 8 |
-| Describe event groups as 11 complete isolated, 11 complete overlapping, 7 incomplete. | 7 |
-| Receive `hypotheses.json`. Received; not yet added to the repository. | 7 |
+| Describe event groups as 11 complete isolated, 11 complete overlapping, 7 incomplete. | 7 (done; deck in Week 11) |
+| Receive `hypotheses.json`. Added unmodified and checked against our draft: all outputs identical. | 7 (done) |
 
 ## Plan
 
@@ -117,12 +117,13 @@ Fixed in `PREREGISTRATION.md`. The design document gives no numeric thresholds, 
 - [x] Specifications for the leakage and leave-one-recorder-out checks fixed in `DEVIATIONS.md` before running.
 
 ### Week 7: Feedback intake and inputs
-- [ ] Add the lead's `hypotheses.json` to `configs/` unmodified. Rerun steps 3 to 11 with it. Compare with the draft run table by table and log any difference in `DEVIATIONS.md`. Expected: identical, because the windows match.
-- [ ] Remove DRAFT labels from the report and tables once the comparison is clean.
-- [ ] Record the field team's description of `Sim Relative Time` in `PREREGISTRATION.md` and `DEVIATIONS.md`. Replace "post-playback" and "playback interval" in prose with "after time zero" and "labeled interval". Mark it as awaiting the lead's confirmation.
-- [ ] Write `src/lead/PROVENANCE.md`: who supplied each script, the date, the SHA-256, and a statement that it is unmodified and imported as is. Do the same for the files in `reference/`.
-- [ ] Use the group names "11 complete isolated, 11 complete overlapping, 7 incomplete" in every document. State that the primary model uses 10 of the 11 isolated events.
-- **Done when:** every table regenerates from the lead's hypotheses file, and the comparison with the draft run is documented.
+- [x] Add the lead's `hypotheses.json` to `configs/` unmodified. Rerun the placebo script with it and compare with the draft run (`src/compare_runs.py`). Result: all 10 outputs identical. Logged in `DEVIATIONS.md`.
+- [x] Remove DRAFT labels from the decision table and the report. Hypotheses are labeled as the lead's file.
+- [x] Record the field team's description of `Sim Relative Time` in `DEVIATIONS.md`, with the lead's confirmation marked pending. `PREREGISTRATION.md` stays unedited and is read through the terminology entry. Prose uses "after time zero" and "labeled interval".
+- [x] Provenance for the lead's scripts (`src/lead/PROVENANCE.md`) and the reference files (`reference/PROVENANCE.md`), checked by `tests/test_provenance.py`.
+- [x] Group names "11 complete isolated, 11 complete overlapping, 7 incomplete" in the README and the report. The primary model uses 10 of the 11 isolated events.
+- [ ] Carried to Week 11: the progress deck still uses the old wording and the draft label.
+- **Done when:** every table regenerates from the lead's hypotheses file, and the comparison with the draft run is documented. Met.
 
 ### Week 8: Decision rules, p-values, and variant 4c
 - [ ] Add variant 4c (20-60 minutes, 5-minute bins, YAMNet-excluded). Config, run, and placebo calibration. Log it as an addition after feedback, with the reason.
@@ -194,11 +195,13 @@ Run from the repo root in PowerShell. The raw dataset is not in git and lives in
    .venv\Scripts\python src\lead\event_study.py --dataset ..\bioacoustics_dataset.csv --output-dir results\intermediate --skip-embeddings
    ```
    Check: `results\intermediate\events.csv` matches `reference\events.csv` (`fc.exe`; ignore line-ending differences), and `audit_report.md` reports 29 human-presence onsets.
-4. Run the contrast, model, and placebo script (needs a hypotheses file; the draft is `configs/hypotheses_draft.json`, to be replaced by the lead's `hypotheses.json` in Week 7):
+4. Run the contrast, model, and placebo script with the lead's hypotheses file (`configs/hypotheses.json`, unmodified). Run the config and provenance tests first:
    ```
-   .venv\Scripts\python src\lead\placebo_hypothesis_analysis.py --input-dir results\intermediate --output-dir results\intermediate\placebo --hypotheses configs\hypotheses_draft.json
+   .venv\Scripts\python tests\test_configs.py
+   .venv\Scripts\python tests\test_provenance.py
+   .venv\Scripts\python src\lead\placebo_hypothesis_analysis.py --input-dir results\intermediate --output-dir results\intermediate\placebo --hypotheses configs\hypotheses.json
    ```
-   Check: primary isolated call-rate estimate near -0.41 with 10 events and 6 recorders, matching `reference/mixed_effects_results.csv`.
+   Check: primary isolated call-rate estimate near -0.41 with 10 events and 6 recorders, matching `reference/mixed_effects_results.csv`. To compare two runs of this script, for example after changing an input, use `src\compare_runs.py <folder A> <folder B>`. It prints `identical` or `DIFFERENT` for every file.
 
 5. Derive each event's labeled span and YAMNet detection count:
    ```

@@ -41,7 +41,10 @@ def test_report_style():
 
 def test_verdict_labels():
     text = build()
-    assert "DRAFT" in text and "pending" in text
+    assert "working draft" in text and "pending" in text
+    assert "11 complete isolated, 11 complete overlapping, 7 incomplete" in text
+    assert "DRAFT" not in text
+    assert "post-playback" not in text.lower() and "direct playback" not in text.lower()
 
 
 if __name__ == "__main__":
